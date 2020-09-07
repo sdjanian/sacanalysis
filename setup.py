@@ -11,5 +11,5 @@ setuptools.setup(
     packages=["sacanalysis"],
     py_modules=['load_gazecom_class'],
     python_requires=">=3.6",
-    install_requires=['pandas','matplotlib','numpy','tqdm',"scipy"],
+    install_requires=['pandas','matplotlib','numpy','tqdm',"scipy","rpy2"],
 )
