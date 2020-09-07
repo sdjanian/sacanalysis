@@ -1,23 +1,24 @@
-#import os
-#os.environ["R_HOME"] = r"C:\Users\FQ73OO\AppData\Local\Continuum\anaconda3\envs\generel\lib\R"
 import rpy2.robjects.packages as rpackages
 import rpy2.robjects as robjects
 import numpy as np
-import pandas as pd
 import rpy2.robjects.numpy2ri
+from rpy2.rinterface import RRuntimeError
+
+def importr_tryhard(packname):
+    try:
+        rpack = rpackages.importr(packname)
+    except RRuntimeError:
+        utils.install_packages(packname)
+        rpack = rpackages.importr(packname)
+    return rpack
+
 rpy2.robjects.numpy2ri.activate()
 utils = rpackages.importr('utils')
-#r_lib_path = "C:/Users/FQ73OO/AppData/Local/Continuum/anaconda3/envs/generel/lib/R/library" # AAU laptop
-r_lib_path = "C:/Users/Shaggy/Anaconda3/envs/generel/Lib/R/library" # Home computer
+list_of_packages = ["madness","mixAK","dplyr"]
 
-madness = rpackages.importr('madness',lib_loc=r_lib_path)
-mixAK = rpackages.importr('mixAK',lib_loc=r_lib_path)
-dplyr = rpackages.importr('dplyr',lib_loc=r_lib_path)
-
-# Needs to be installed before this function can run.
-#utils.install_packages('madness',contriburl="https://cran.r-project.org/web/packages/madness/index.html")
-#utils.install_packages('mixAK')
-#utils.install_packages('dplyr')
+for package in list_of_packages:
+    importr_tryhard(package)
+    
 
 rjmcmc = robjects.r('''
 mcmc_func <- function(y){
@@ -67,19 +68,6 @@ if __name__ == "__main__":
     ,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4
     ,4,4,5,5,5,5,5,5,5,5,5,5]
     y = np.expand_dims(np.array(working),axis=(1))
+    y1 =  np.expand_dims(np.array(not_working),axis=(1))
     print(rjmcmc(y))      
-    
-    
-    df  = pd.read_json("F:/OneDrive - Aalborg Universitet/Eye_tracking/GazeComCritique.git/output2/scores_40ms.json")
-    vectors = df["vector"]
-    vector = np.expand_dims(np.array(vectors.iloc[14]),axis=1)
-    #print(rjmcmc(vector))      
-    print(rjmcmc_output(vector)) 
-    print(rjmcmc_output(not_working)) 
-    df_sub = df.iloc[0:5]
-    bf_values = df_sub["vector"].apply(lambda x: rjmcmc_output(np.expand_dims(np.array(x),axis=1)))
-
-    from scipy.stats import kurtosis, skew
-    skew_values = df_sub["vector"].apply(lambda x: skew(x))
-    kurtosis_values = df_sub["vector"].apply(lambda x: kurtosis(x))
-    
+    #print(rjmcmc(y1))      
