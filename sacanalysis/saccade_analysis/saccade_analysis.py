@@ -1,9 +1,3 @@
-# Custom libraries
-import load_gazecom_class
-import preprocessing
-from rjmcmc import rjmcmc_output
-import calculateEvents as cEvents
-
 # Python libraries
 import pandas as pd
 import numpy as np
@@ -11,9 +5,7 @@ import random
 from scipy.stats import entropy
 from scipy.stats import kurtosis, skew
 import modality
-
-from colorama import init
-init()
+from .rjmcmc import rjmcmc_output
 
 class SaccadeAnalysis:
     """
@@ -223,6 +215,13 @@ class SaccadeAnalysis:
         return max(x)-min(x)     
 
 if __name__ == "__main__":
+    # Custom libraries
+    import load_gazecom_class
+    import preprocessing
+    import calculateEvents as cEvents  
+    from colorama import init
+    init()    
+    
     random.seed(10)
     # Load GazeCom and calculate events
     if 'df' not in locals():

@@ -14,6 +14,7 @@ def importr_tryhard(packname):
 
 rpy2.robjects.numpy2ri.activate()
 utils = rpackages.importr('utils')
+utils.chooseCRANmirror(ind=1)
 list_of_packages = ["madness","mixAK","dplyr"]
 
 for package in list_of_packages:
