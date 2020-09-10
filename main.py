@@ -1,9 +1,9 @@
 # Custom libraries
-import load_gazecom_class
-import calculateEvents as cEvents
-from saccade_plots import* 
-import preprocessing
-import saccade_analysis
+#import load_gazecom_class
+#import calculateEvents as cEvents
+#from saccade_plots import* 
+#import preprocessing
+from sacanalysis import Load_gazecom, Preproccesing, SaccadeAnalysis, CalculateEventDurationClass, plotRankedSaccades
 
 # Python libraries
 import pandas as pd
@@ -91,10 +91,10 @@ if __name__ == "__main__":
     random.seed(10)
     # Load GazeCom and calculate events
     if 'df' not in locals():
-        load_gazecom = load_gazecom_class.Load_gazecom()
+        load_gazecom = Load_gazecom(r"C:\GazeCom_Data\all_features")
         df = load_gazecom.load_all_data(unit_for_time="Milli")
     
-    CEvents = cEvents.CalculateEventDurationClass()
+    CEvents = CalculateEventDurationClass()
     if 'event_df' not in locals():
         event_df = CEvents.calculateBasicEventStatistics(df)
 
@@ -122,13 +122,13 @@ if __name__ == "__main__":
         # Make the analysis op the saccades and store results
         extracted_saccades = CEvents.extractEventsToDdf(df,sub_event_df,event_label = load_gazecom.class_event_gazecom["Saccade"],verbose=0)
         
-        Preprocess = preprocessing.Preproccesing(extracted_saccades)
+        Preprocess = Preproccesing(extracted_saccades)
         processed_saccades = Preprocess.GetPreprocessedSaccades()
         average_saccade = Preprocess.GetAverageSaccade()
         histogram_velocity_vector = Preprocess.GetHistogramVectors()     
         
-        SaccadeAnalysis = saccade_analysis.SaccadeAnalysis(processed_saccades,average_saccade,histogram_velocity_vector)
-        scores = SaccadeAnalysis.GetResidualScore()        
+        _SaccadeAnalysis = SaccadeAnalysis(processed_saccades,average_saccade,histogram_velocity_vector)
+        scores = _SaccadeAnalysis.GetResidualScore()        
         scores_column_list = GetScoreListToLoopThrough(scores)
         if produce_plots_bool==True:
             for score_column in scores_column_list:

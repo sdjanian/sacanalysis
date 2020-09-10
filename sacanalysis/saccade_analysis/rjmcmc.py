@@ -8,6 +8,7 @@ def importr_tryhard(packname):
     try:
         rpack = rpackages.importr(packname)
     except RRuntimeError:
+        print("Installing R package ",packname)
         utils.install_packages(packname)
         rpack = rpackages.importr(packname)
     return rpack

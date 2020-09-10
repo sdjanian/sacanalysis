@@ -4,7 +4,7 @@ import numpy as np
 import random
 from scipy.stats import entropy
 from scipy.stats import kurtosis, skew
-import modality
+from .get_dip import getDip
 from .rjmcmc import rjmcmc_output
 
 class SaccadeAnalysis:
@@ -130,7 +130,7 @@ class SaccadeAnalysis:
         
     def __CalulateHartigansDiptest(self) -> None:
        self.__scores["dipvalue_score"] = self.__scores["vector"].apply(
-               lambda x: modality.diptest.getDip(x)
+               lambda x: getDip(x)
                )
     def __CalculateEntropy(self) -> None:
         self.__scores["entropy_score"] = self.__scores["vector"].apply(

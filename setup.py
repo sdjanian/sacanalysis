@@ -11,6 +11,6 @@ setuptools.setup(
     packages=["sacanalysis"],
     py_modules=['load_gazecom_class','plot','saccade_analysis'],
     python_requires=">=3.6",
-    install_requires=['pandas==0.23.4','matplotlib','numpy','tqdm','scipy','seaborn','modality>=1.0'],
+    install_requires=['matplotlib','numpy>=1.15','tqdm','scipy','seaborn','modality>=1.1','pandas==0.23.4'],
     dependency_links =['https://github.com/kjohnsson/modality/archive/master.zip#egg=modality-1.1'],
 )
