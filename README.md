@@ -38,7 +38,16 @@ Alternatively it can also be installed with using setup.py install instead.
 cd PATH
 python setup.py install
 ```
-
+### Quick Windows install
+In conda promt copy paste this snippit and change PATH to the master directory:
+```python
+conda create --name saccade_analysis_test python=3.6
+y
+conda activate saccade_analysis_test
+cd PATH
+pip install .
+y
+```
 ### Test if installed correctly
 Run `test/test_sacanalysis.py`. If there are no errors it is installed correctly.
 ### Common bugs
