@@ -91,7 +91,7 @@ if __name__ == "__main__":
     random.seed(10)
     # Load GazeCom and calculate events
     if 'df' not in locals():
-        load_gazecom = Load_gazecom(r"C:\GazeCom_Data\all_features")
+        load_gazecom = Load_gazecom(r"C:\Users\FQ73OO\OneDrive - Aalborg Universitet\Eye_tracking\GazeCom_sample_data\all_features")
         df = load_gazecom.load_all_data(unit_for_time="Milli")
     
     CEvents = CalculateEventDurationClass()
