@@ -8,7 +8,7 @@ These are scientific scripts for how well saccades have been labelled. It uses t
 
 There are three dependencies to be aware of:
 * `modality` 
-Is used to perform [Hartigan's Diptest for Unimodality](https://github.com/alimuldal/diptest). It requries you to have OpenMPI installed which can be found [here](https://www.microsoft.com/en-us/download/details.aspx?id=57467)
+Is used to perform [Hartigan's Diptest for Unimodality](https://github.com/alimuldal/diptest). It requries you to have OpenMPI installed which can be found [here](https://www.microsoft.com/en-us/download/details.aspx?id=57467). Only OpenMPI 10.0 has been checked to work.
 
 * `rpy2`
 Is used as an interface R. It requires R to be installed. This can be done with `conda install -c r rpy2` or `pip install rpy2`. When using conda it will also install a separate version of R in the environment while pip will only install `rpy2`. 
@@ -34,8 +34,10 @@ pip install .
 ```
 
 Alternatively it can also be installed with using setup.py install instead.
-`python setup.py install`
-
+```python
+cd PATH
+python setup.py install
+```
 
 ### Test if installed correctly
 Run `test/test_sacanalysis.py`. If there are no errors it is installed correctly.
@@ -54,6 +56,8 @@ and look for `R_HOME`. The path to the R folder can be manually set with
 import os
 os.environ["R_HOME"] = PATH_TO_R
 ```
+
+* `from mpi4py import MPI : error: ImportError: DLL load failed:` OpenMPI not found. Most likely it is not installed.
 
 * `pandas` errors are caused by a wrong pandas version. The correct version is 0.23.4. To check run
 ```python
