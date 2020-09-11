@@ -20,7 +20,7 @@ R packages used for rjmcmc.py. They will automatically be installed if missing. 
 ## Installation
 
 ### Windows
-Download installating at `https://github.com/Kongskrald/sacanalysis/archive/master.zip` and unzip.
+Download installation at `https://github.com/Kongskrald/sacanalysis/archive/master.zip` and unzip.
 
 Recommended to create a conda environment first `conda create --name saccade_analysis python=3.6`.
 
@@ -36,12 +36,29 @@ pip install .
 Alternatively it can also be installed with using setup.py install instead.
 `python setup.py install`
 
+
+### Test if installed correctly
+Run `test/test_sacanalysis.py`. If there are no errors it is installed correctly.
 ### Common bugs
 
-`rpy2` bugs are caused by wrong pathing. Running The path to the R folder can be manually set with 
+* `OSError: cannot load library 'C:\Program Files\R\R-4.0.2\bin\x64\R.dll': error 0x7e` R is not installed. Look under `rpy2` in installation guide.
+
+* `rpy2` bugs are caused by wrong pathing. To check if pathing it is a pathing error run
+```python
+import rpy2.situation as situation
+for row in situation.iter_info():
+    print(row)
+```
+and look for `R_HOME`. The path to the R folder can be manually set with 
 ```python
 import os
 os.environ["R_HOME"] = PATH_TO_R
+```
+
+* `pandas` errors are caused by a wrong pandas version. The correct version is 0.23.4. To check run
+```python
+import pandas as pd
+print(pd.__version__)
 ```
 ## Usage
 To perform the whole analysis run `main.py`. In conda prompt write
@@ -50,8 +67,7 @@ conda activate saccade_analysis
 spyder
 ```
 Before running `main.py` make sure:
-* To set the variable `r_lib_path` in `rjmcmc.py` to your R library in Anacadona.
-* In `main.py` set the path argument in `load_gazecom_class.Load_gazecom(GAZECOM_PATH=YOURPATH)` in `main.py` to be your path to the GazeCom data leading to the feature e.g. `../GazeCom_Data/all_features`. Alternativly place the GazeCom folder at the level before this repository as that is it's default pathing.
+* In `main.py` set the path argument in `Load_gazecom(GAZECOM_PATH=YOURPATH)` in `main.py` to be your path to the GazeCom data leading to the feature e.g. `../GazeCom_Data/all_features`. Alternativly place the GazeCom folder at the level before this `main.py` as that is it's default pathing.
 * In `main.py` set `produce_plots_bool` to `True` if plots for all saccades for all metrics is wanted. By default it is `False`.
 and then run `main.py`
 
@@ -61,4 +77,4 @@ How to cite ...
 
 ## Author
 Shagen Djanian
-2020-08-17
+2020-09-11
