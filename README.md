@@ -44,6 +44,7 @@ In conda promt copy paste this snippit and change PATH to the master directory:
 cd PATH
 conda create --name saccade_analysis_test python=3.6 -y
 conda activate saccade_analysis_test
+conda install -c r rpy2 -y
 pip install .
 ```
 ### Test if installed correctly
