@@ -91,7 +91,7 @@ if __name__ == "__main__":
     random.seed(10)
     # Load GazeCom and calculate events
     if 'df' not in locals():
-        load_gazecom = Load_gazecom(r"C:\Users\FQ73OO\OneDrive - Aalborg Universitet\Eye_tracking\GazeCom_sample_data\all_features")
+        load_gazecom = Load_gazecom("./gazecom_small/all_features")
         df = load_gazecom.load_all_data(unit_for_time="Milli")
     
     CEvents = CalculateEventDurationClass()
@@ -128,7 +128,7 @@ if __name__ == "__main__":
         histogram_velocity_vector = Preprocess.GetHistogramVectors()     
         
         _SaccadeAnalysis = SaccadeAnalysis(processed_saccades,average_saccade,histogram_velocity_vector)
-        scores = _SaccadeAnalysis.GetResidualScore()        
+        scores = _SaccadeAnalysis.GetScores()        
         scores_column_list = GetScoreListToLoopThrough(scores)
         if produce_plots_bool==True:
             for score_column in scores_column_list:
@@ -162,4 +162,4 @@ if __name__ == "__main__":
         scores_with_samp = AddSaccadeSamplesToScore(scores,processed_saccades) # Add the saccade samples as columns samp_0...samp_n to each row                
         SaveResultsAsCsv(scores_with_samp,save_dir,"scores",sub)  
 
-    winsound.Beep(freq+10, beep_duration)
+    #winsound.Beep(freq+10, beep_duration)

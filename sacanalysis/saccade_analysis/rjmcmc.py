@@ -22,7 +22,7 @@ for package in list_of_packages:
     importr_tryhard(package)
     
 
-rjmcmc = robjects.r('''
+__rjmcmc = robjects.r('''
 mcmc_func <- function(y){
 keep=2000
 Floor<-floor(min(y))
@@ -54,7 +54,7 @@ return(BF_for_GT_1_mode)
 
 def rjmcmc_output(y):
     try:
-        BF_value = rpy2.robjects.numpy2ri.ri2py(rjmcmc(y))[0]
+        BF_value = rpy2.robjects.numpy2ri.ri2py(__rjmcmc(y))[0]
     except:
         BF_value = None
     return BF_value
@@ -71,5 +71,5 @@ if __name__ == "__main__":
     ,4,4,5,5,5,5,5,5,5,5,5,5]
     y = np.expand_dims(np.array(working),axis=(1))
     y1 =  np.expand_dims(np.array(not_working),axis=(1))
-    print(rjmcmc(y))      
+    print(__rjmcmc(y))      
     #print(rjmcmc(y1))      

@@ -1,10 +1,7 @@
 import numpy as np
-import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from matplotlib.ticker import ScalarFormatter
-import warnings
-warnings.filterwarnings('ignore')
 
 class Plotting_class:
     palette = sns.color_palette("bright")

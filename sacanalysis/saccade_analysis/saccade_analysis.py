@@ -1,7 +1,5 @@
-# Python libraries
 import pandas as pd
 import numpy as np
-import random
 from scipy.stats import entropy
 from scipy.stats import kurtosis, skew
 from .get_dip import getDip
@@ -61,7 +59,7 @@ class SaccadeAnalysis:
         self.__one_sample_duration = 1000/250 
     
     
-    def __CalcuateResiduals(self):
+    def __CalcuateScores(self):
         
         # Create residual dataframe
         self.__scores = self.__saccades.groupby("unique_saccade_number").apply(
@@ -125,7 +123,7 @@ class SaccadeAnalysis:
             
         """
         self.__scores["flatness_score"] = self.__saccades.groupby("unique_saccade_number").apply(
-                lambda x: min(x["x_z_trans"].rolling(windows_size).apply(self.minmaxdiff).dropna())
+                lambda x: min(x["x_z_trans"].rolling(windows_size).apply(self.__minmaxdiff).dropna())
                 )      
         
     def __CalulateHartigansDiptest(self) -> None:
@@ -186,7 +184,7 @@ class SaccadeAnalysis:
                 self.__scores["ranked_"+residual_col] = normalizeRanks(self.__scores.index)
             self.__scores["ranked_"+residual_col][self.__scores[residual_col].isna()==True]=np.nan     
             
-    def GetResidualScore(self) -> pd.DataFrame:
+    def GetScores(self) -> pd.DataFrame:
         """
             Returns a dataframe with all the preproccesed data added as
             ['residual_sum_x_z_trans'       : Residual sum of the horizontal signal from average saccade in z-score transformation , 
@@ -206,12 +204,12 @@ class SaccadeAnalysis:
                                               for https://pdfs.semanticscholar.org/29a4/f9cd5faa12593ac13d0349ba842d48eb792a.pdf
             and each row is a timestamp sample of a saccade.
         """
-        self.__CalcuateResiduals()
+        self.__CalcuateScores()
         return self.__scores
         
     
     @staticmethod            
-    def minmaxdiff(x):
+    def __minmaxdiff(x):
         return max(x)-min(x)     
 
 if __name__ == "__main__":
@@ -219,8 +217,7 @@ if __name__ == "__main__":
     import load_gazecom_class
     import preprocessing
     import calculateEvents as cEvents  
-    from colorama import init
-    init()    
+    import random
     
     random.seed(10)
     # Load GazeCom and calculate events
