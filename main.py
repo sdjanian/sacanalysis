@@ -9,6 +9,8 @@ import os
 import winsound
 beep_duration = 1000  # millisecond
 freq = 440  # Hz
+import warnings
+warnings.filterwarnings("ignore")
 
 def GetScoreListToLoopThrough(scores:dict) -> list:
     """
@@ -35,7 +37,7 @@ def GetCorrectTransformationToUseInAnalysis(score_column:str) -> str:
         Output:
             str: Is either mean normalized upwards saccade or z-score tranformed of the a mean normalized upwards saccade
     """
-    if any(map(lambda x: x in  score_column,["main", "speed_1","x_norm_up","velocity","dip","entropy","kurtosis","skew","bfvalue"])):
+    if any(map(lambda x: x in  score_column,["main", "velocity","x_norm_up","velocity","dip","entropy","kurtosis","skew","bfvalue"])):
         transformation_column = "x_norm_up"
     elif any(map(lambda x: x in  score_column,["x_z_trans", "flatness"])):
         transformation_column = "x_z_trans"
@@ -85,9 +87,11 @@ if __name__ == "__main__":
     if 'df' not in locals():
         load_gazecom = Load_gazecom("./gazecom_small/all_features")
         df = load_gazecom.load_all_data(unit_for_time="Milli")
+        df = df.rename(columns = {"speed_1":"velocity"})
     
     CEvents = CalculateEventDurationClass()
     if 'event_df' not in locals():
+        #df = df.drop(columns=["source","x"])
         event_df = CEvents.calculateBasicEventStatistics(df)
 
     ### Variables

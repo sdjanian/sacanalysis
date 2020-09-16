@@ -3,16 +3,43 @@ import numpy as np
 import tqdm
 import copy
 import itertools
+from .utility import sourceCheck, xyTimeVelocityCheck
+            
 
 class CalculateEventDurationClass:
 
-    def __init__(self,rater_col_name="handlabeller_final"):
-        self._rater_col_name=rater_col_name
-        
+    def __init__(self):
+        None        
+    @classmethod   
+    def calculateBasicEventStatistics(cls,df:pd.DataFrame,remove_outliers:bool = False,label_col:str='handlabeller_final',verboose = 1) -> pd.DataFrame:            
+        """
+        Description
+        ----------        
+        Takes a dataframe with eye tracking signal and eye movement labels and returns a dataframe with
+        event statistics like event start, end, duration, amplitude and peak amplitude
+
+        Parameters
+        ----------
+        df : pd.DataFrame
+            Eye tracking data. Needs columns x, y, and time. If multiple recordings add column source with recording names.
+        remove_outliers : bool, optional
+            Removes outliers. The default is False.
+        label_col : str, optional
+            Column name for the column containing labels for eye movements. The default is 'handlabeller_final'.
+        verboose : TYPE, optional
+            DESCRIPTION. The default is 1.
+
+        Returns
+        -------
+        df_event : pd.DataFrame
+            Dataframe containing where each row is a saccade with columns event start, end, duration, amplitude and peak amplitude
+
+        """
        
-    def calculateBasicEventStatistics(self,df=None,remove_outliers = False,rater_col_name='handlabeller_final'):            
         if remove_outliers is True:
             print("Removing outliers")
+        xyTimeVelocityCheck(df)    
+        df = sourceCheck(df,verboose) 
             
         event_type_list = []
         event_duration_list=[]
@@ -38,7 +65,7 @@ class CalculateEventDurationClass:
             else:
                 df_sub = df
                 
-            labelled_event = df_sub[rater_col_name]
+            labelled_event = df_sub[label_col]
             event_start = np.where(np.roll(labelled_event,1)!=labelled_event)[0]
             if event_start.size == 0:
               print("There was only detected 1 event")
@@ -65,7 +92,7 @@ class CalculateEventDurationClass:
             event_amplitude = np.sqrt((event_amplitude[:,0]**2)+(event_amplitude[:,1]**2)) # Calculate euclidian distance between event starts and ends
             
             # Calculate the peak velocities of events
-            velocity = df_sub["speed_1"]       
+            velocity = df_sub["velocity"]       
             event_peak_velocity = []
             for start,end in (zip(event_start,event_end)):
                 event_peak_velocity.append(np.amax(velocity.iloc[start:end]))
@@ -77,7 +104,7 @@ class CalculateEventDurationClass:
             
             
             if remove_outliers:
-                without_outliers = self.is_outlier(event_duration)
+                without_outliers = cls.is_outlier(event_duration)
                 event_type = event_type[~without_outliers]
                 event_duration = event_duration[~without_outliers]
                 event_source = event_source[~without_outliers]
@@ -103,6 +130,7 @@ class CalculateEventDurationClass:
         df_event['event_starts']= df_event['event_starts'].astype('int32')
         df_event['event_ends']=df_event['event_ends'].astype('int32')
         return df_event  
+    
     @staticmethod
     def is_outlier(points, thresh=3.5):
         """
@@ -140,34 +168,59 @@ class CalculateEventDurationClass:
     @staticmethod
     def extractEventsToDdf(df:pd.core.frame.DataFrame,
                            event_df:pd.core.frame.DataFrame,
-                           event_label:int,verbose = 1)->pd.core.frame.DataFrame:
-            event_list = []
-            event_numbers =[]
-            unique_saccade_counter = 1
-            df = df.reset_index()
-            groups = [grp for di, grp in df.groupby('source')] # Faster too loop through the list then get extract each subset during the loop.
-            for sub_df in tqdm.tqdm(groups,total=len(groups),position=1,leave=True,desc="Extracting all samples of events"):
-                recording = sub_df["source"].unique()
-                events = event_df[(event_df["event_type"]==event_label) &(event_df["event_source"]==recording[0])] # recording[0] because it's a list with 1 element
-                for i,(index, row) in enumerate(events.iterrows()):
-                    event = copy.deepcopy(sub_df.iloc[row["event_starts"]:row["event_ends"]+1]) # +1 is because of weird Python indexing. Easier to +1 then figure out the cause.
-                    event_numbers.append(list(np.full(len(event),i)))
-                    event["norm_time"] = event["time"]-event["time"].iloc[0]
-                    event["unique_saccade_number"] = np.full(len(event),unique_saccade_counter)
-                    event["start_time"] = np.full(len(event),row["event_starts"])
-                    event["end_time"] = np.full(len(event),row["event_ends"])
-                    unique_saccade_counter = unique_saccade_counter+1
-                    event_list.append(event)
-            event_numbers_flat = list(itertools.chain.from_iterable(event_numbers))
-            event_samples_df = pd.concat(event_list)
-            event_samples_df["event_number"] = event_numbers_flat
-            if verbose == 1:
-                print("Event",event_label,"samples selected:", len(event_samples_df),
-                      "\nEvent",event_label,"samples total:",len(df[df["handlabeller_final"]==event_label]),
-                      "\nNumber of difference:",len(df[df["handlabeller_final"]==event_label])-len(event_samples_df),
-                      "\nDifferent indices:",df[df["handlabeller_final"]==event_label].index.difference(event_samples_df.index),
-                      "\nPercentage of event in samples from all events:", np.round(len(df[df["handlabeller_final"]==event_label])/len(df),4))
-            return event_samples_df
+                           event_label:int,
+                           label_col:str="handlabeller_final",
+                           verbose = 1)->pd.core.frame.DataFrame:
+        """
+        Extracts 1 type of eye movement event from a eye tracking dataframe with eye movement labels. 
+        Needs the output from calculateBasicEventStatistics in event_df.
+
+        Parameters
+        ----------
+        df : pd.core.frame.DataFrame
+            Eye tracking dataframe.
+        event_df : pd.core.frame.DataFrame
+            output from calculateBasicEventStatistics.
+        event_label : int
+            The label for the event that needs to be extracted. E.g. 2 for saccade
+        label_col : str
+            Name of column that has the labelled movements. The default is "handlabeller_final"
+        verbose : TYPE, optional
+            DESCRIPTION. The default is 1.
+
+        Returns
+        -------
+        event_samples_df : pd.core.frame.DataFrame
+            df but only with the desired eye movement. Adds a column "unique_saccade_number" from 1 to n to label each seperate saccade.
+
+        """
+        event_list = []
+        event_numbers =[]
+        unique_saccade_counter = 1
+        df = df.reset_index()
+        groups = [grp for di, grp in df.groupby('source')] # Faster too loop through the list then get extract each subset during the loop.
+        for sub_df in tqdm.tqdm(groups,total=len(groups),position=1,leave=True,desc="Extracting all samples of events"):
+            recording = sub_df["source"].unique()
+            events = event_df[(event_df["event_type"]==event_label) &(event_df["event_source"]==recording[0])] # recording[0] because it's a list with 1 element
+            for i,(index, row) in enumerate(events.iterrows()):
+                event = copy.deepcopy(sub_df.iloc[row["event_starts"]:row["event_ends"]+1]) # +1 is because of weird Python indexing. Easier to +1 then figure out the cause.
+                event_numbers.append(list(np.full(len(event),i)))
+                event["norm_time"] = event["time"]-event["time"].iloc[0]
+                event["unique_saccade_number"] = np.full(len(event),unique_saccade_counter)
+                event["start_time"] = np.full(len(event),row["event_starts"])
+                event["end_time"] = np.full(len(event),row["event_ends"])
+                unique_saccade_counter = unique_saccade_counter+1
+                event_list.append(event)
+        event_numbers_flat = list(itertools.chain.from_iterable(event_numbers))
+        event_samples_df = pd.concat(event_list)
+        event_samples_df["event_number"] = event_numbers_flat
+        if verbose == 1:
+            print("Event",event_label,"samples selected:", len(event_samples_df),
+                  "\nEvent",event_label,"samples total:",len(df[df[label_col]==event_label]),
+                  "\nNumber of difference:",len(df[df[label_col]==event_label])-len(event_samples_df),
+                  "\nDifferent indices:",df[df[label_col]==event_label].index.difference(event_samples_df.index),
+                  "\nPercentage of event in samples from all events:", np.round(len(df[df[label_col]==event_label])/len(df),4))
+        return event_samples_df
 
 if __name__ == "__main__":
     import load_gazecom_class
@@ -241,7 +294,7 @@ if __name__ == "__main__":
     for idx,event_label in tqdm.tqdm(enumerate(label_list),desc="Saving samples to csv"):
         df_sample = event_sample_dfs[idx]
 
-        df_sample_to_save = df_sample[["subject","stimuli","time","x","y","handlabeller_final","event_number"]]
+        df_sample_to_save = df_sample[["subject","stimuli","time","x","y","speed_1","event_number"]]
         df_sample_to_save.to_csv(load_gazecom.class_label_gazecom[event_label]+"_event_samples.csv",index=False)
 
 

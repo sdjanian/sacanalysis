@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from .time_units import getTimeinSec
+from .error_handling import sourceCheck, xyCheck
 
 def GetVelocity(eye_movement_signal:pd.DataFrame,timestamp_col:str,windowsWidth:int = 1, time_unit:str = "micro"):    
     """   
@@ -30,15 +31,9 @@ def GetVelocity(eye_movement_signal:pd.DataFrame,timestamp_col:str,windowsWidth:
 
     """
     
-    try:
-        x = eye_movement_signal["x"]
-        y = eye_movement_signal["y"]
-    except KeyError:
-        print("Either column x or y is missing from eye_movement_signal")
-    
-    if "velocity" in eye_movement_signal:
-        raise Exception("Velocity already exists")
 
+    xyCheck(eye_movement_signal) # sanity check
+    eye_movement_signal = sourceCheck(eye_movement_signal)
     x = eye_movement_signal["x"]
     y = eye_movement_signal["y"]
     velocity_list = np.zeros(len(eye_movement_signal))
@@ -67,9 +62,6 @@ def GetVelocity(eye_movement_signal:pd.DataFrame,timestamp_col:str,windowsWidth:
             velocity = np.nan
             continue
         
-        # invalid interval
-        #if (startPos == endPos):
-        #    break;
         ampl = np.sqrt(((x[endPos]-x[startPos])**2+(y[endPos]-y[startPos])**2))
         if timestamp_col != None:
             delta_t =(eye_movement_signal[timestamp_col].iloc[endPos]-eye_movement_signal[timestamp_col].iloc[startPos])
@@ -111,7 +103,7 @@ if __name__=="__main__":
     vel_df = GetVelocity(df_original,timestamp_col="time")
     vel_df = vel_df.dropna()
     from pandas.testing import assert_series_equal
-    original = vel_df["speed_1"]
+    original = vel_df["velocity"]
     mine = vel_df["velocity"]
     test2 = original!=mine
     test = original.equals(mine)

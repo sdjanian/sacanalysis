@@ -1,9 +1,8 @@
-
 # Python libraries
 import pandas as pd
 import numpy as np
 from scipy import stats
-
+from .utility import getTimeinSec
 
 class Preproccesing:
     """
@@ -11,7 +10,7 @@ class Preproccesing:
     Preproccesing consists of ...:
         removes saccades with unstable timestamps.
         chooses only saccades where the horizontal component is 5 times larger than the vertical. Can be changed using __ChooseOnlyHoriztonalOrVerticalSaccades(self,ratio_threshold = 5)
-        mean normalizes the horizontal (x), vertical (y) and instantanious velocity (speed_1).
+        mean normalizes the horizontal (x), vertical (y) and instantanious velocity (velocity).
         flips all saccades so they point in the same direction horizontaly (upwards)
         z-score transform the upwards horizontal position (x_norm_up)
         
@@ -53,9 +52,9 @@ class Preproccesing:
         
     """
 
-    def __init__(self,saccades:pd.DataFrame, Hz:int=250):
+    def __init__(self,saccades:pd.DataFrame, Hz:int=250,time_unit="milli"):
         self.__saccades = saccades
-        self.__one_sample_duration = 1000/Hz 
+        self.__one_sample_duration = getTimeinSec(time_unit)/Hz 
             
     def __preprocessSaccades(self):
         self.__RemoveSaccadesWithUnstableTimestamps()
@@ -110,7 +109,7 @@ class Preproccesing:
         self.__saccadesToProcces["y_norm"] = self.__saccadesToProcces.groupby("unique_saccade_number")["y"].transform(
                 lambda y: y-y.mean() 
                 )
-        self.__saccadesToProcces["velocity_norm"] = self.__saccadesToProcces.groupby("unique_saccade_number")["speed_1"].transform(
+        self.__saccadesToProcces["velocity_norm"] = self.__saccadesToProcces.groupby("unique_saccade_number")["velocity"].transform(
         lambda x: x-x.mean()
         )
         
@@ -142,7 +141,7 @@ class Preproccesing:
                 lambda x: np.mean(x)
                 )
         
-        # Average saccade velocity (using speed_1)
+        # Average saccade velocity (using velocity)
         average_saccade_velocity = self.__saccadesToProcces.groupby("norm_time")["velocity_norm"].apply(
                 lambda x: np.mean(x)
                 )
@@ -162,7 +161,7 @@ class Preproccesing:
                 vector.append(numberOfSamplesInBin)            
             return np.hstack(vector).squeeze()
 
-        wide_form = self.__saccadesToProcces.pivot(index="unique_saccade_number",columns = "norm_time",values = "speed_1")
+        wide_form = self.__saccadesToProcces.pivot(index="unique_saccade_number",columns = "norm_time",values = "velocity")
         wide_form["vector"] = wide_form.apply(lambda x: vectorizeHelperFunction(x) if x.index.name!="unique_saccade_number" else None,axis=1)
         wide_form=wide_form.reset_index()
         wide_form=wide_form.rename(columns={"index":"unique_saccade_number"})
