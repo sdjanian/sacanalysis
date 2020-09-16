@@ -1,20 +1,12 @@
 # Custom libraries
-#import load_gazecom_class
-#import calculateEvents as cEvents
-#from saccade_plots import* 
-#import preprocessing
 from sacanalysis import Load_gazecom, Preproccesing, SaccadeAnalysis, CalculateEventDurationClass, plotRankedSaccades
-
 # Python libraries
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib as mpl
 import random
 import tqdm
 import os
 import winsound
-import copy
 beep_duration = 1000  # millisecond
 freq = 440  # Hz
 

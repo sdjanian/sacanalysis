@@ -1,6 +1,5 @@
 import rpy2.robjects.packages as rpackages
 import rpy2.robjects as robjects
-import numpy as np
 import rpy2.robjects.numpy2ri
 from rpy2.rinterface import RRuntimeError
 
@@ -60,6 +59,7 @@ def rjmcmc_output(y):
     return BF_value
 
 if __name__ == "__main__":
+    import numpy as np
     working = [0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3
     ,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3
     ,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,5

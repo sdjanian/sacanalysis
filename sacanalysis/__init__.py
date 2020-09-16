@@ -4,3 +4,4 @@ from .preprocessing import Preproccesing
 from .saccade_plots import plotRankedSaccades
 from .saccade_plots import Plotting_class
 from .saccade_analysis import SaccadeAnalysis
+from .utility import GetVelocity
