@@ -152,7 +152,7 @@ class SaccadeAnalysis:
                lambda x: kurtosis(x)
                )         
     def __AddHistogramVectorToScore(self) -> None:
-        
+        self.__scores = self.__scores.reset_index(drop=True)
         self.__scores = self.__scores.sort_values(by=["unique_saccade_number"])
         self.__histogram_velocity_vector = self.__histogram_velocity_vector.sort_values(by=["unique_saccade_number"])
         self.__scores["vector"] = self.__histogram_velocity_vector["vector"].values
