@@ -1,9 +1,10 @@
 import pandas as pd
 import numpy as np
+import tqdm
 from .time_units import getTimeinSec
 from .error_handling import sourceCheck, xyCheck
 
-def GetVelocity(eye_movement_signal:pd.DataFrame,timestamp_col:str,windowsWidth:int = 1, time_unit:str = "micro"):    
+def GetVelocity(eye_movement_signal:pd.DataFrame,timestamp_col:str,windowWidth:int = 1, time_unit:str = "micro"):    
     """   
     Description
     ---------- 
@@ -33,13 +34,45 @@ def GetVelocity(eye_movement_signal:pd.DataFrame,timestamp_col:str,windowsWidth:
     
 
     xyCheck(eye_movement_signal) # sanity check
-    eye_movement_signal = sourceCheck(eye_movement_signal)
-    x = eye_movement_signal["x"]
-    y = eye_movement_signal["y"]
-    velocity_list = np.zeros(len(eye_movement_signal))
-    windowWidth = 1
+    if timestamp_col != None:
+        None
+    else:
+        raise Exception("timestamp_col not defined")    
+        
+    if "source" in eye_movement_signal.columns:
+        print("Source on col")
+        eye_movement_signal = __CalculateVelocityOnMultipleRecordings(eye_movement_signal,timestamp_col,windowWidth, time_unit)
+        
+
+    else:                
+        eye_movement_signal = sourceCheck(eye_movement_signal)
+        x = eye_movement_signal["x"]
+        y = eye_movement_signal["y"]
+        timestamp = eye_movement_signal[timestamp_col]
+        #velocity_list = np.zeros(len(eye_movement_signal))
+        eye_movement_signal["velocity"] = __CalcateVelocity(x,y,timestamp,windowWidth,time_unit)
+
+    
+     #= velocity_list
+    return eye_movement_signal
+
+def __CalculateVelocityOnMultipleRecordings(eye_movement_signal:pd.DataFrame,timestamp_col:str,windowWidth:int = 1, time_unit:str = "micro"):
+    recording_list =[]
+    groups = [grp for di, grp in eye_movement_signal.groupby('source')] # Faster too loop through the list then get extract each subset during the loop.
+    for recording in tqdm.tqdm(groups,total=len(groups),position=1,leave=True,desc="Calculating velocity on multple recordings"):
+        x = recording["x"]
+        y = recording["y"]
+        timestamp = recording[timestamp_col]
+        #velocity_list = np.zeros(len(eye_movement_signal))
+        recording["velocity"] = __CalcateVelocity(x,y,timestamp,windowWidth,time_unit)
+        recording_list.append(recording)
+    eye_movement_signal = pd.concat(recording_list)
+    return eye_movement_signal
+
+def __CalcateVelocity(x,y,timestamp,windowWidth:int = 1, time_unit:str = "micro"):
     step = int(np.ceil(windowWidth/2))
-    data_size = len(eye_movement_signal)
+    data_size = len(x)
+    velocity_list = np.zeros(data_size)
     for i in range(data_size):
     
         # get initial interval
@@ -57,23 +90,19 @@ def GetVelocity(eye_movement_signal:pd.DataFrame,timestamp_col:str,windowsWidth:
         if (endPos > data_size):
             endPos = i
         
-        if (x[endPos] is np.nan or x[startPos] is np.nan or
-            y[endPos] is np.nan or y[startPos] is np.nan):
+        if (x.iloc[endPos] is np.nan or x.iloc[startPos] is np.nan or
+            y.iloc[endPos] is np.nan or y.iloc[startPos] is np.nan):
             velocity = np.nan
             continue
         
-        ampl = np.sqrt(((x[endPos]-x[startPos])**2+(y[endPos]-y[startPos])**2))
-        if timestamp_col != None:
-            delta_t =(eye_movement_signal[timestamp_col].iloc[endPos]-eye_movement_signal[timestamp_col].iloc[startPos])
-            time = __safe_div(delta_t,getTimeinSec(time_unit))   
-        else:
-            raise Exception("timestamp_col not defined")
+        ampl = np.sqrt(((x.iloc[endPos]-x.iloc[startPos])**2+(y.iloc[endPos]-y.iloc[startPos])**2))
+        delta_t =(timestamp.iloc[endPos]-timestamp.iloc[startPos])
+        time = __safe_div(delta_t,getTimeinSec(time_unit))   
+
              
         velocity = np.round(__safe_div(ampl,time),2)
         velocity_list[i] = velocity
-    
-    eye_movement_signal["velocity"] = velocity_list
-    return eye_movement_signal
+    return velocity_list
 
 def __safe_div(x,y):
     if y == 0:
@@ -81,28 +110,37 @@ def __safe_div(x,y):
     return x / y
 
 if __name__=="__main__":
-    """
-    df = pd.DataFrame({"x":[1,1,1,1,1,1,2,2,2,2,2,3,3,3,3,6,7,8,8,9,9,9,9,9,7,7,7,5,5,4,3,22,2],
-                       "y":[5,5,5,6,6,6,30,30,7,7,7,24,25,24,23,50,30,50,8,9,5,3,7,10,11,23,24,52,54,52,56,52,32]})
-    
-    test =shift(df["x"],4,cval=np.NaN)
 
-
-    x1 = 590.9
-    y1 = 5.2
-    
-    x2 = 590.6
-    y2 = 5.0
-    """
     from scipy.io import arff
-
-    data, meta = arff.loadarff(r"C:\GazeCom_Data\all_features\beach\AAF_beach.arff")
-    df_original = pd.DataFrame(data)   
-    #example = (np.sqrt((x2-x1)**2)+np.sqrt((y2-y1)**2))/(4000/1000000)
+    from pandas.testing import assert_series_equal
+    from sacanalysis import Load_gazecom
+    # check multple recordings
+    load_gazecom = Load_gazecom("C:/sacanalysis/gazecom_small/all_features")
+    df_multiple_rec = load_gazecom.load_all_data(unit_for_time="Milli")
+    list_of_rec = df_multiple_rec["source"].unique()
+    rec_1 = df_multiple_rec[df_multiple_rec["source"]==list_of_rec[0]].drop(columns=(["source"]))
+    rec_2 = df_multiple_rec[df_multiple_rec["source"]==list_of_rec[1]].drop(columns=(["source"]))
+    rec_3 = df_multiple_rec[df_multiple_rec["source"]==list_of_rec[2]].drop(columns=(["source"]))
+    
+    df_multiple_rec_vel = GetVelocity(df_multiple_rec,timestamp_col="time")
+    rec_1_vel = GetVelocity(rec_1,timestamp_col="time")
+    rec_2_vel = GetVelocity(rec_2,timestamp_col="time")
+    rec_3_vel = GetVelocity(rec_3,timestamp_col="time")  
+    assert_series_equal(df_multiple_rec_vel["velocity"][df_multiple_rec["source"]==list_of_rec[0]],
+                        rec_1_vel["velocity"],check_less_precise=True,check_names=False)
+    assert_series_equal(df_multiple_rec_vel["velocity"][df_multiple_rec["source"]==list_of_rec[1]],
+                        rec_2_vel["velocity"],check_less_precise=True,check_names=False)
+    assert_series_equal(df_multiple_rec_vel["velocity"][df_multiple_rec["source"]==list_of_rec[2]],
+                        rec_3_vel["velocity"],check_less_precise=True,check_names=False)
+    
+    subdf = df_multiple_rec_vel[df_multiple_rec["source"]==list_of_rec[1]]
+    
+    # Check single recording
+    data, meta = arff.loadarff(r"C:/sacanalysis/gazecom_small/all_features/beach/AAF_beach.arff")
+    df_original = pd.DataFrame(data)       
     df_original[df_original["confidence"]==0] = np.nan
     vel_df = GetVelocity(df_original,timestamp_col="time")
     vel_df = vel_df.dropna()
-    from pandas.testing import assert_series_equal
     original = vel_df["velocity"]
     mine = vel_df["velocity"]
     test2 = original!=mine

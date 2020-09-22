@@ -31,7 +31,7 @@ class Load_gazecom:
         self.GAZECOM_PATH = GAZECOM_PATH
       
     #@profile  
-    def load_all_data(self,keys = None,unit_for_time = "Micro"):
+    def load_all_data(self,keys = None,unit_for_time = "micro"):
         """
         Prepares the data by parsing throught the GazeCom database sequentially and splitting each session into windows.
         prints the time it takes. You can download the GazeCom dataset at http://michaeldorr.de/smoothpursuit/deep_eye_movement_classification_package.zip
@@ -80,7 +80,7 @@ class Load_gazecom:
                     #print(i)
                     None
                 df_temp = pd.DataFrame(data)
-                if unit_for_time == "Milli":
+                if unit_for_time == "milli":
                     df_temp["time"] = df_temp["time"]/1000.0 # Convert from micro seconds to milli seconds
                 df_temp["source"] =[session]*len(df_temp)
                 

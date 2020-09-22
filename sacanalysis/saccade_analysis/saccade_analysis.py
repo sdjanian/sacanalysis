@@ -2,8 +2,10 @@ import pandas as pd
 import numpy as np
 from scipy.stats import entropy
 from scipy.stats import kurtosis, skew
+
 from .get_dip import getDip
 from .rjmcmc import rjmcmc_output
+from ..utility.error_handling import xyTimeVelocityCheck, sourceCheck
 
 class SaccadeAnalysis:
     """
@@ -53,23 +55,25 @@ class SaccadeAnalysis:
     """    
 
     def __init__(self,saccades:pd.DataFrame, average_saccade:pd.DataFrame,histogram_velocity_vector:pd.DataFrame):
+        xyTimeVelocityCheck(saccades)
+        saccades = sourceCheck(saccades)
         self.__saccades = saccades
         self.__average_saccade = average_saccade
         self.__histogram_velocity_vector = histogram_velocity_vector
         self.__one_sample_duration = 1000/250 
     
     
-    def __CalcuateScores(self):
+    def __CalcuateScores(self,windows_size: int=3):
         
         # Create residual dataframe
         self.__scores = self.__saccades.groupby("unique_saccade_number").apply(
-                lambda x: x[["unique_saccade_number","source","subject","stimuli","start_time","end_time"]].iloc[0]
+                lambda x: x[["unique_saccade_number","source","start_time","end_time"]].iloc[0]
                 )
 
         self.__ResidualZScoreSaccade()
         self.__ResidualUpwardsSaccade()
         self.__ResidualVelocity()
-        self.__FlatnessScore()
+        self.__FlatnessScore(windows_size=windows_size)
         
         #Vector analyses
         self.__AddHistogramVectorToScore()       
@@ -89,7 +93,7 @@ class SaccadeAnalysis:
                 )   
         
         self.__scores["residual_sum_x_z_trans"] = self.__saccades.groupby("unique_saccade_number")["residual_x_z_trans"].apply(
-                lambda x:np.sum(x)
+                lambda x:np.mean(x)
                 )
     def __ResidualUpwardsSaccade(self) -> None:
         """Calculate the residual for each saccade from the average saccade. The norm is applied to ensure all values are positive."""
@@ -98,7 +102,7 @@ class SaccadeAnalysis:
                 ) 
         # Calculate the sum of the residuals
         self.__scores["residual_sum_x_norm_up"] = self.__saccades.groupby("unique_saccade_number")["residual_x_norm_up"].apply(
-                lambda x:np.sum(x)
+                lambda x:np.mean(x)
                 )        
     
     def __ResidualVelocity(self) -> None:
@@ -111,7 +115,7 @@ class SaccadeAnalysis:
                 )
         # Calculate the sum of the residuals
         self.__scores["residual_sum_velocity"] = self.__saccades.groupby("unique_saccade_number")["residual_velocity"].apply(
-                    lambda x:np.sum(x)
+                    lambda x:np.mean(x)
                     )
 
     def __FlatnessScore(self,windows_size:int=3) -> None:
@@ -184,7 +188,7 @@ class SaccadeAnalysis:
                 self.__scores["ranked_"+residual_col] = normalizeRanks(self.__scores.index)
             self.__scores["ranked_"+residual_col][self.__scores[residual_col].isna()==True]=np.nan     
             
-    def GetScores(self) -> pd.DataFrame:
+    def GetScores(self,windows_size: int=3) -> pd.DataFrame:
         """
             Returns a dataframe with all the preproccesed data added as
             ['residual_sum_x_z_trans'       : Residual sum of the horizontal signal from average saccade in z-score transformation , 
@@ -204,7 +208,7 @@ class SaccadeAnalysis:
                                               for https://pdfs.semanticscholar.org/29a4/f9cd5faa12593ac13d0349ba842d48eb792a.pdf
             and each row is a timestamp sample of a saccade.
         """
-        self.__CalcuateScores()
+        self.__CalcuateScores(windows_size)
         return self.__scores
         
     

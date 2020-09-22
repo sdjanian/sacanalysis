@@ -46,14 +46,13 @@ if __name__ == '__main__':
 
     mean_sac_x = [None]*6
     mean_sac_x_norm_up = [None]*6
-    mean_sac_z =[None]*6
     mean_sac_vel = [None]*6
     for i in np.arange(0,6): 
         mean_sac_x[i] = np.mean([x_1[i],x_2[i]])
         mean_sac_x_norm_up[i] = np.mean([x_1_norm_up[i],x_2_norm_up[i]])
-        mean_sac_z[i] = np.mean([z_score_1[i],z_score_2[i]])
         mean_sac_vel[i] = np.mean([velocity_1_norm[i],velocity_2_norm[i]])
-        
+    
+    mean_sac_z = stats.zscore(mean_sac_x_norm_up)
     df_mean_sac = pd.DataFrame({"x_z_trans":mean_sac_z,"x_norm_up":mean_sac_x_norm_up,"velocity_norm":mean_sac_vel})
     df_mean_sac.to_csv("20_ms_average_saccade_manual_calculation.csv")
     

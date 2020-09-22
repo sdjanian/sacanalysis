@@ -1,6 +1,7 @@
 # Python libraries
 import pandas as pd
 import numpy as np
+import copy
 from scipy import stats
 from .utility import getTimeinSec
 
@@ -56,10 +57,10 @@ class Preproccesing:
         self.__saccades = saccades
         self.__one_sample_duration = getTimeinSec(time_unit)/Hz 
             
-    def __preprocessSaccades(self):
+    def __preprocessSaccades(self,ratio_threshold=5):
         self.__RemoveSaccadesWithUnstableTimestamps()
         self.__GetHorVerRatio()
-        self.__ChooseOnlyHoriztonalOrVerticalSaccades()
+        self.__ChooseOnlyHoriztonalOrVerticalSaccades(ratio_threshold)
         self.__NormalizePositionalAndVelocitySignal()
         self.__TransformSaccadesToUpwardsDirection()
         self.__ZScoreTransformPosition()
@@ -84,7 +85,7 @@ class Preproccesing:
         x_y_ratios_array =[]
         for ratio in x_y_ratios:
             x_y_ratios_array.extend(ratio)     
-        self.__stable_timestamps["x_y_ratio"] = x_y_ratios_array
+        self.__stable_timestamps.loc[:,"x_y_ratio"] = x_y_ratios_array
                          
 
 
@@ -94,7 +95,10 @@ class Preproccesing:
         Filter saccades based on threshold. With a ratio of above 5 the saccedes are mainly horizontal, 
         meaning that the horizontal position is 5 times larger then the vertical.
         '''
-        self.__saccadesToProcces = self.__stable_timestamps[self.__stable_timestamps["x_y_ratio"]>ratio_threshold]
+        if ratio_threshold == None:
+            self.__saccadesToProcces = self.__stable_timestamps
+        else:
+            self.__saccadesToProcces = self.__stable_timestamps[self.__stable_timestamps["x_y_ratio"]>ratio_threshold]
         
     def __NormalizePositionalAndVelocitySignal(self)-> None:
         """
@@ -102,14 +106,14 @@ class Preproccesing:
         Adds the normalized position to dataframe as "x_norm" and "y_norm" columns respectivly.
         """
         # Normalise the horizontal position
-        self.__saccadesToProcces["x_norm"] = self.__saccadesToProcces.groupby("unique_saccade_number")["x"].transform(
+        self.__saccadesToProcces.loc[:,"x_norm"] = self.__saccadesToProcces.groupby("unique_saccade_number")["x"].transform(
                 lambda x: x-x.mean() 
                 )
         # Normalise the vertical position
-        self.__saccadesToProcces["y_norm"] = self.__saccadesToProcces.groupby("unique_saccade_number")["y"].transform(
+        self.__saccadesToProcces.loc[:,"y_norm"] = self.__saccadesToProcces.groupby("unique_saccade_number")["y"].transform(
                 lambda y: y-y.mean() 
                 )
-        self.__saccadesToProcces["velocity_norm"] = self.__saccadesToProcces.groupby("unique_saccade_number")["velocity"].transform(
+        self.__saccadesToProcces.loc[:,"velocity_norm"] = self.__saccadesToProcces.groupby("unique_saccade_number")["velocity"].transform(
         lambda x: x-x.mean()
         )
         
@@ -118,7 +122,7 @@ class Preproccesing:
         Convert the saccades to all point upwards based on the mean normalized horitzontal position.
         Adds the upwards pointing saccades as "x_norm_up".
         """
-        self.__saccadesToProcces["x_norm_up"] = self.__saccadesToProcces.groupby("unique_saccade_number")["x_norm"].apply(
+        self.__saccadesToProcces.loc[:,"x_norm_up"] = self.__saccadesToProcces.groupby("unique_saccade_number")["x_norm"].apply(
                 lambda x: x*-1 if x.iloc[0]-x.iloc[-1] > 0 else x
                 ) 
         
@@ -127,21 +131,28 @@ class Preproccesing:
         Z score transforms horizontal position of the upwards pointing saccades.
         """
         # Z score transform the horizontal position
-        self.__saccadesToProcces["x_z_trans"] = self.__saccadesToProcces.groupby("unique_saccade_number")["x_norm_up"].transform(
+        self.__saccadesToProcces.loc[:,"x_z_trans"] = self.__saccadesToProcces.groupby("unique_saccade_number")["x_norm_up"].transform(
                 lambda x: stats.zscore(x)
                 )        
     def __CalcuateAvergeSaccade(self) -> pd.DataFrame:
-        # Average saccade in z transformed domain
-        average_saccade_z_score = self.__saccadesToProcces.groupby("norm_time")["x_z_trans"].apply(
-                lambda x: np.mean(x)
-                )
         
         # Average saccade in normalized degrees
         average_saccade_norm_deg = self.__saccadesToProcces.groupby("norm_time")["x_norm_up"].apply(
                 lambda x: np.mean(x)
                 )
         
-        # Average saccade velocity (using velocity)
+        """ Wrong way to calculate the z-scored average saccade
+        # Average saccade in z transformed domain
+        average_saccade_z_score = self.__saccadesToProcces.groupby("norm_time")["x_z_trans"].apply(
+                lambda x: np.mean(x)
+                )
+        """
+        
+        # Average saccade in z transformed domain
+        average_saccade_z_score = pd.Series(data=stats.zscore(average_saccade_norm_deg),
+                                            name = "x_z_trans",
+                                            index=average_saccade_norm_deg.index)
+        
         average_saccade_velocity = self.__saccadesToProcces.groupby("norm_time")["velocity_norm"].apply(
                 lambda x: np.mean(x)
                 )
@@ -162,7 +173,7 @@ class Preproccesing:
             return np.hstack(vector).squeeze()
 
         wide_form = self.__saccadesToProcces.pivot(index="unique_saccade_number",columns = "norm_time",values = "velocity")
-        wide_form["vector"] = wide_form.apply(lambda x: vectorizeHelperFunction(x) if x.index.name!="unique_saccade_number" else None,axis=1)
+        wide_form.loc[:,"vector"] = wide_form.apply(lambda x: vectorizeHelperFunction(x) if x.index.name!="unique_saccade_number" else None,axis=1)
         wide_form=wide_form.reset_index()
         wide_form=wide_form.rename(columns={"index":"unique_saccade_number"})
         #normalized_saccades["vector"] = normalized_saccades.groupby("unique_saccade_number")["x_norm_up"].transform(
@@ -190,11 +201,11 @@ class Preproccesing:
         """
         return self.__GenerateHistogramVector()
     
-    def GetPreprocessedSaccades(self) -> pd.DataFrame:
+    def GetPreprocessedSaccades(self,ratio_threshold = 5) -> pd.DataFrame:
         """
         Runs the preprocessing and returns the saccades in a df where each row is a time stamp and the columns are the different processes.
         """
-        self.__preprocessSaccades()
+        self.__preprocessSaccades(ratio_threshold=ratio_threshold)
         return self.__saccadesToProcces
 
     @staticmethod
