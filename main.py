@@ -85,8 +85,8 @@ if __name__ == "__main__":
     random.seed(10)
     # Load GazeCom and calculate events
     if 'df' not in locals():
-        load_gazecom = Load_gazecom("./gazecom_small/all_features")
-        df = load_gazecom.load_all_data(unit_for_time="Milli")
+        load_gazecom = Load_gazecom(r"C:\Users\FQ73OO\OneDrive - Aalborg Universitet\Eye_tracking\GazeCom_Data\all_features")
+        df = load_gazecom.load_all_data(unit_for_time="milli")
         df = df.rename(columns = {"speed_1":"velocity"})
     
     CEvents = CalculateEventDurationClass()
@@ -95,8 +95,8 @@ if __name__ == "__main__":
         event_df = CEvents.calculateBasicEventStatistics(df)
 
     ### Variables
-    start_dur = 20
-    end_dur = 24
+    start_dur = 48
+    end_dur = 52
     eye_tracker_frequency = 250
     save_dir = "output"
     produce_plots_bool = False # Produce pdf of all ranked saccades
