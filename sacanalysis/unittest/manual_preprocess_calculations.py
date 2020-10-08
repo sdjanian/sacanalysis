@@ -7,12 +7,13 @@ if __name__ == '__main__':
     #unittest.main()
     
     df = pd.read_csv("test_saccades.csv") 
-    preprocess_class = Preproccesing(df,time_unit="milli")
+    #preprocess_class = Preproccesing(df,time_unit="milli")
     #get1 = preprocess_class.GetPreprocessedSaccades()
     # saccade 1
+    x_1_sac_id = df["unique_saccade_number"].iloc[0]
     x_1 = df["x"].iloc[0:6].values
     x_1_mean = x_1.mean()
-    x_1_norm = x_1-x_1_mean
+    x_1_norm = x_1-x_1_mean    
     
     y_1 = df["y"].iloc[0:6].values
     y_1_mean = y_1.mean()
@@ -28,6 +29,7 @@ if __name__ == '__main__':
     z_score_1 = stats.zscore(x_1_norm_up)
 
     # saccade 2
+    x_2_sac_id = df["unique_saccade_number"].iloc[6]
     x_2 = df["x"].iloc[6:12].values
     x_2_mean = x_2.mean()
     x_2_norm = x_2-x_2_mean
@@ -45,6 +47,7 @@ if __name__ == '__main__':
     z_score_2 = stats.zscore(x_2_norm_up)
     
     # saccade 3
+    x_3_sac_id = df["unique_saccade_number"].iloc[12]
     x_3 = df["x"].iloc[12:18].values
     x_3_mean = x_3.mean()
     x_3_norm = x_3-x_3_mean
@@ -63,6 +66,7 @@ if __name__ == '__main__':
     z_score_3 = stats.zscore(x_3_norm_up)
     
     # saccade 4
+    x_4_sac_id = df["unique_saccade_number"].iloc[18]
     x_4 = df["x"].iloc[18:24].values
     x_4_mean = x_4.mean()
     x_4_norm = x_4-x_4_mean
@@ -102,5 +106,80 @@ if __name__ == '__main__':
     df_four_saccades["x_z_trans"] = np.concatenate((z_score_1,z_score_2,z_score_3,z_score_4),axis=None)
     df_four_saccades.to_csv("four_20_ms_saccades_preprocessed_output.csv")
     
-    #preprocess_class = Preproccesing(df_four_saccades,time_unit="milli")
-    #get1 = preprocess_class.GetPreprocessedSaccades() 
+    ##########################################################################
+    def create1Vector(vel_sample,vel_value):
+        return [vel_sample]*np.int(np.round(vel_value))
+    
+    histogram_df = pd.DataFrame({"unique_saccade_number":[],
+                           "0":[],
+                           "4":[],
+                           "8":[],
+                           "12":[],
+                           "16":[],
+                           "20":[],
+                           "vector":[]})
+    histogram_df = histogram_df.append(pd.Series(), ignore_index=True)
+    histogram_df = histogram_df.append(pd.Series(), ignore_index=True)
+    histogram_df = histogram_df.append(pd.Series(), ignore_index=True)
+    histogram_df = histogram_df.append(pd.Series(), ignore_index=True)       
+    histogram_df["vector"] = histogram_df.astype(object)
+    
+    
+    histogram_df["unique_saccade_number"].iloc[0] = x_1_sac_id
+    histogram_df["0"].iloc[0] = velocity_1[0]
+    histogram_df["4"].iloc[0] = velocity_1[1]
+    histogram_df["8"].iloc[0] = velocity_1[2]
+    histogram_df["12"].iloc[0] = velocity_1[3]
+    histogram_df["16"].iloc[0] = velocity_1[4]
+    histogram_df["20"].iloc[0] = velocity_1[5]
+    
+    x1_velocity_vector = []
+    ixd_list = [0,1,2,3,4,5]
+    for ixd, vel in zip(ixd_list,velocity_1):
+        x1_velocity_vector = x1_velocity_vector + create1Vector(ixd,vel)
+    histogram_df["vector"].iloc[0] = x1_velocity_vector    
+    
+       
+    histogram_df["unique_saccade_number"].iloc[1] = x_2_sac_id
+    histogram_df["0"].iloc[1] = velocity_2[0]
+    histogram_df["4"].iloc[1] = velocity_2[1]
+    histogram_df["8"].iloc[1] = velocity_2[2]
+    histogram_df["12"].iloc[1] = velocity_2[3]
+    histogram_df["16"].iloc[1] = velocity_2[4]
+    histogram_df["20"].iloc[1] = velocity_2[5]
+    
+    x2_velocity_vector = []
+    ixd_list = [0,1,2,3,4,5]
+    for ixd, vel in zip(ixd_list,velocity_2):
+        x2_velocity_vector = x2_velocity_vector + create1Vector(ixd,vel)
+    histogram_df["vector"].iloc[1] = x2_velocity_vector    
+
+
+    histogram_df["unique_saccade_number"].iloc[2] = x_3_sac_id
+    histogram_df["0"].iloc[2] = velocity_3[0]
+    histogram_df["4"].iloc[2] = velocity_3[1]
+    histogram_df["8"].iloc[2] = velocity_3[2]
+    histogram_df["12"].iloc[2] = velocity_3[3]
+    histogram_df["16"].iloc[2] = velocity_3[4]
+    histogram_df["20"].iloc[2] = velocity_3[5]
+    
+    x3_velocity_vector = []
+    ixd_list = [0,1,2,3,4,5]
+    for ixd, vel in zip(ixd_list,velocity_3):
+        x3_velocity_vector = x3_velocity_vector + create1Vector(ixd,vel)
+    histogram_df["vector"].iloc[2] = x3_velocity_vector
+
+    histogram_df["unique_saccade_number"].iloc[3] = x_4_sac_id
+    histogram_df["0"].iloc[3] = velocity_4[0]
+    histogram_df["4"].iloc[3] = velocity_4[1]
+    histogram_df["8"].iloc[3] = velocity_4[2]
+    histogram_df["12"].iloc[3] = velocity_4[3]
+    histogram_df["16"].iloc[3] = velocity_4[4]
+    histogram_df["20"].iloc[3] = velocity_4[5]
+    
+    x4_velocity_vector = []
+    ixd_list = [0,1,2,3,4,5]
+    for ixd, vel in zip(ixd_list,velocity_4):
+        x4_velocity_vector = x4_velocity_vector + create1Vector(ixd,vel)
+    histogram_df["vector"].iloc[3] = x4_velocity_vector    
+    histogram_df.to_json("four_20_ms_saccade_vectors.json")

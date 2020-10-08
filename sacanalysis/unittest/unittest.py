@@ -14,9 +14,11 @@ class TestPreprocess(unittest.TestCase):
         cls.manual_calculated_average_saccade = pd.read_csv("20_ms_average_saccade_manual_calculation.csv")
         cls.four_saccades_for_input = pd.read_csv("four_20_ms_saccades.csv")
         cls.four_saccades_correct_output = pd.read_csv("four_20_ms_saccades_preprocessed_output.csv")
+        cls.four_saccade_correct_vectors = pd.read_json("four_20_ms_saccade_vectors.json")
         cls.Preprocess = Preproccesing(cls.four_saccades_for_input)
         cls.processed_saccades = cls.Preprocess.GetPreprocessedSaccades()
         cls.processed_average_saccade = cls.Preprocess.GetAverageSaccade()
+        cls.processed_saccade_vectors = cls.Preprocess.GetHistogramVectors()
         
     def test_x_norm(self):
         assert_series_equal(self.four_saccades_correct_output["x_norm"].reset_index(drop=True),
@@ -52,6 +54,11 @@ class TestPreprocess(unittest.TestCase):
                             self.processed_average_saccade["velocity_norm"].reset_index(drop=True),
                             check_names=False, check_index_type=False,check_less_precise = True)        
 
+    def test_vector(self):
+        assert_series_equal(self.four_saccade_correct_vectors["vector"].reset_index(drop=True),
+                            self.processed_saccade_vectors["vector"].reset_index(drop=True),
+                            check_names=False, check_index_type=False,check_less_precise = True)     
+        
 class TestSaccadeAnalysis(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -92,6 +99,8 @@ if __name__ == '__main__':
     four_saccades_for_input = pd.read_csv("four_20_ms_saccades.csv")
     four_saccades_correct_output = pd.read_csv("four_20_ms_saccades_preprocessed_output.csv")
     scores_correct_output = pd.read_csv("scores_four_saccades_manually_calculated.csv")
+    four_saccade_correct_vectors = pd.read_json("four_20_ms_saccade_vectors.json")
+
     Preprocess = Preproccesing(four_saccades_for_input)
     processed_saccades = Preprocess.GetPreprocessedSaccades()
     processed_average_saccade = Preprocess.GetAverageSaccade()
