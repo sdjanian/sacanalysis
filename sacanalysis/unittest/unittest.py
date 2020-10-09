@@ -62,7 +62,7 @@ class TestPreprocess(unittest.TestCase):
 class TestSaccadeAnalysis(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.four_saccades_for_input = pd.read_csv("four_20_ms_saccades.csv")
+        cls.four_saccades_for_input = pd.read_csv("four_20_ms_saccades.csv")        
         cls.Preprocess = Preproccesing(cls.four_saccades_for_input)
         cls.processed_saccades = cls.Preprocess.GetPreprocessedSaccades()
         cls.processed_average_saccade = cls.Preprocess.GetAverageSaccade()
@@ -72,7 +72,7 @@ class TestSaccadeAnalysis(unittest.TestCase):
                                           cls.histogram_vectors)
         cls.scores = cls.SacAnalysis.GetScores()
         cls.scores = cls.scores.sort_values(by="unique_saccade_number")
-        cls.scores_manually_calculated = pd.read_csv("scores_four_saccades_manually_calculated.csv")
+        cls.scores_manually_calculated = pd.read_json("scores_four_saccades_manually_calculated.json")
         cls.scores_manually_calculated = cls.scores_manually_calculated.sort_values(by="unique_saccade_number")
 
         
@@ -89,8 +89,19 @@ class TestSaccadeAnalysis(unittest.TestCase):
         assert_series_equal(self.scores_manually_calculated["residual_sum_velocity"].reset_index(drop=True),
                             self.scores["residual_sum_velocity"].reset_index(drop=True),check_less_precise = True)
         
+    def test_vector(self):
+        assert_series_equal(self.scores_manually_calculated["vector"].reset_index(drop=True),
+                            self.scores["vector"].reset_index(drop=True),check_less_precise = True)       
         
-
+    def test_entropy_score(self):
+        assert_series_equal(self.scores_manually_calculated["entropy_score"].reset_index(drop=True),
+                            self.scores["entropy_score"].reset_index(drop=True),check_less_precise = True) 
+    def test_kurtosis_score(self):
+        assert_series_equal(self.scores_manually_calculated["kurtosis_score"].reset_index(drop=True),
+                            self.scores["kurtosis_score"].reset_index(drop=True),check_less_precise = True) 
+    def test_skew_score(self):
+        assert_series_equal(self.scores_manually_calculated["skew_score"].reset_index(drop=True),
+                            self.scores["skew_score"].reset_index(drop=True),check_less_precise = True)         
 if __name__ == '__main__':
     unittest.main()
     
@@ -98,7 +109,7 @@ if __name__ == '__main__':
     manual_calculated_average_saccade = pd.read_csv("20_ms_average_saccade_manual_calculation.csv")
     four_saccades_for_input = pd.read_csv("four_20_ms_saccades.csv")
     four_saccades_correct_output = pd.read_csv("four_20_ms_saccades_preprocessed_output.csv")
-    scores_correct_output = pd.read_csv("scores_four_saccades_manually_calculated.csv")
+    scores_correct_output = pd.read_json("scores_four_saccades_manually_calculated.json")
     four_saccade_correct_vectors = pd.read_json("four_20_ms_saccade_vectors.json")
 
     Preprocess = Preproccesing(four_saccades_for_input)
@@ -110,4 +121,5 @@ if __name__ == '__main__':
                                       histogram_vectors)
     scores = SacAnalysis.GetScores()    
     """
+    
     
