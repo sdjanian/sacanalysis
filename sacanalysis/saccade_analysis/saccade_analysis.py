@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
-from scipy.stats import entropy
-from scipy.stats import kurtosis, skew
+from scipy.stats import entropy, kurtosis, skew
+from collections import Counter
 
 from .get_dip import getDip
 from .rjmcmc import rjmcmc_output
@@ -136,7 +136,7 @@ class SaccadeAnalysis:
                )
     def __CalculateEntropy(self) -> None:
         self.__scores["entropy_score"] = self.__scores["vector"].apply(
-               lambda x: entropy(x)
+               lambda x: entropy(list(Counter(x).values()),base=2)
                )       
 
     def __CalculateBFValue(self) -> None:
@@ -151,7 +151,7 @@ class SaccadeAnalysis:
        
     def __CalculateKurtosis(self) -> None:
        self.__scores["kurtosis_score"] = self.__scores["vector"].apply(
-               lambda x: kurtosis(x)
+               lambda x: kurtosis(x,fisher=False)
                )         
     def __AddHistogramVectorToScore(self) -> None:
         self.__scores = self.__scores.reset_index(drop=True)
