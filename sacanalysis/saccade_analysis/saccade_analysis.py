@@ -38,6 +38,7 @@ class SaccadeAnalysis:
             ['residual_sum_x_z_trans'       : Residual sum of the horizontal signal from average saccade in z-score transformation , 
             'residual_sum_x_norm_up'        : Residual sum of the horizontal signal from average saccade in mean normalized transformation,
             'residual_sum_velocity'         : Residual sum of the velocity from average saccade in degrees pr second,
+            'residual_sum_velocity_z_trans' : Residual sum of the velocity from average saccade in degrees pr second,
             'flatness_score'                : The flatness of a saccade by measuring the lowest dispersion with a rolling window,
             'ranked_residual_sum_x_z_trans' : Rankings of each saccade by residual_sum_x_z_trans with 1 being best ranked,
             'ranked_residual_sum_x_norm_up' : Rankings of each saccade by residual_sum_x_norm_up with 1 being best ranked,
@@ -73,6 +74,7 @@ class SaccadeAnalysis:
         self.__ResidualZScoreSaccade()
         self.__ResidualUpwardsSaccade()
         self.__ResidualVelocity()
+        self.__ResidualZScoreVelocity()
         self.__FlatnessScore(windows_size=windows_size)
         
         #Vector analyses
@@ -95,6 +97,16 @@ class SaccadeAnalysis:
         self.__scores["residual_sum_x_z_trans"] = self.__saccades.groupby("unique_saccade_number")["residual_x_z_trans"].apply(
                 lambda x:np.mean(x)
                 )
+        
+    def __ResidualZScoreVelocity(self) -> None:
+        self.__saccades["residual_velocity_z_trans"] = self.__saccades.groupby("unique_saccade_number")["velocity_z_trans"].transform(
+                lambda x: abs(x-self.__average_saccade["velocity_z_trans"].values)
+                )   
+        
+        self.__scores["residual_sum_velocity_z_trans"] = self.__saccades.groupby("unique_saccade_number")["residual_velocity_z_trans"].apply(
+                lambda x:np.mean(x)
+                )
+        
     def __ResidualUpwardsSaccade(self) -> None:
         """Calculate the residual for each saccade from the average saccade. The norm is applied to ensure all values are positive."""
         self.__saccades["residual_x_norm_up"] = self.__saccades.groupby("unique_saccade_number")["x_norm_up"].transform(

@@ -37,12 +37,12 @@ class Preproccesing:
             Returns a dataframe with all the preproccesed data added as
             ['norm_time', 'unique_saccade_number',
             'start_time', 'end_time', 'event_number', 'x_y_ratio', 'x_norm',
-            'y_norm', 'velocity_norm', 'x_norm_up', 'x_z_trans']
+            'y_norm', 'velocity_norm', 'velocity_z_trans', 'x_norm_up', 'x_z_trans']
             and each row is a timestamp.
             
         GetAverageSaccade : 
             Returns the average saccades in a dataframe with columns
-            ['x_z_trans', 'x_norm_up', 'velocity_norm']
+            ['x_z_trans', 'x_norm_up', 'velocity_norm','velocity_z_trans']
             and each row is a timestamp.
 
         GetHistogramVectors:
@@ -64,6 +64,7 @@ class Preproccesing:
         self.__NormalizePositionalAndVelocitySignal()
         self.__TransformSaccadesToUpwardsDirection()
         self.__ZScoreTransformPosition()
+        self.__ZScoreTransformVelocity()
         
     def __RemoveSaccadesWithUnstableTimestamps(self) -> None:
         '''
@@ -133,7 +134,16 @@ class Preproccesing:
         # Z score transform the horizontal position
         self.__saccadesToProcces.loc[:,"x_z_trans"] = self.__saccadesToProcces.groupby("unique_saccade_number")["x_norm_up"].transform(
                 lambda x: stats.zscore(x)
-                )        
+                )    
+        
+    def __ZScoreTransformVelocity(self) -> None:
+        """
+        Z score transforms horizontal position of the upwards pointing saccades.
+        """
+        # Z score transform the horizontal position
+        self.__saccadesToProcces.loc[:,"velocity_z_trans"] = self.__saccadesToProcces.groupby("unique_saccade_number")["velocity_norm"].transform(
+                lambda x: stats.zscore(x)
+                )           
     def __CalcuateAvergeSaccade(self) -> pd.DataFrame:
         
         # Average saccade in normalized degrees
@@ -148,16 +158,21 @@ class Preproccesing:
                 )
         """
         
-        # Average saccade in z transformed domain
+        # Average saccade position in z transformed domain
         average_saccade_z_score = pd.Series(data=stats.zscore(average_saccade_norm_deg),
                                             name = "x_z_trans",
                                             index=average_saccade_norm_deg.index)
+        
+        # Average saccade velocity in z transformed domain
+        average_saccade_z_score_velocity = pd.Series(data=stats.zscore(average_saccade_norm_deg),
+                                    name = "velocity_z_trans",
+                                    index=average_saccade_norm_deg.index)
         
         average_saccade_velocity = self.__saccadesToProcces.groupby("norm_time")["velocity_norm"].apply(
                 lambda x: np.mean(x)
                 )
         # Average saccade dataframe
-        average_saccade = pd.DataFrame([average_saccade_z_score,average_saccade_norm_deg,average_saccade_velocity]).T
+        average_saccade = pd.DataFrame([average_saccade_z_score,average_saccade_norm_deg,average_saccade_velocity,average_saccade_z_score_velocity]).T
     
         return average_saccade
     
