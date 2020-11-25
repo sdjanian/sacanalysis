@@ -76,7 +76,21 @@ if __name__ == '__main__':
     scores["vector"].iloc[0] =  four_saccades_correct_vector["vector"].iloc[0]
     scores["vector"].iloc[1] =  four_saccades_correct_vector["vector"].iloc[1]
     scores["vector"].iloc[2] =  four_saccades_correct_vector["vector"].iloc[2]
-    scores["vector"].iloc[3] =  four_saccades_correct_vector["vector"].iloc[3]      
+    scores["vector"].iloc[3] =  four_saccades_correct_vector["vector"].iloc[3] 
+
+ 
+    
+    def flatness_calc (sac:pd.Series):
+        _max = sac["x_z_trans"].rolling(3).apply(max).dropna()
+        _min = sac["x_z_trans"].rolling(3).apply(min).dropna()
+        _diff = _max-_min
+        return min(_diff)
+    
+    scores["flatness_score"].iloc[0] =  flatness_calc(sac_1)
+    scores["flatness_score"].iloc[1] =  flatness_calc(sac_2)
+    scores["flatness_score"].iloc[2] =  flatness_calc(sac_3)
+    scores["flatness_score"].iloc[3] =  flatness_calc(sac_4)    
+
     scores.to_json("scores_four_saccades_manually_calculated.json")
 
     #unique_saccade_number,source,residual_sum_x_z_trans,residual_sum_x_norm_up,residual_sum_velocity,flatness_score,vector,dipvalue_score,entropy_score,kurtosis_score,skew_score,bfvalue_score,ranked_residual_sum_x_z_trans,ranked_residual_sum_x_norm_up,ranked_residual_sum_velocity,ranked_flatness_score,ranked_dipvalue_score,ranked_entropy_score,ranked_kurtosis_score,ranked_skew_score

@@ -96,12 +96,18 @@ class TestSaccadeAnalysis(unittest.TestCase):
     def test_entropy_score(self):
         assert_series_equal(self.scores_manually_calculated["entropy_score"].reset_index(drop=True),
                             self.scores["entropy_score"].reset_index(drop=True),check_less_precise = True) 
+        
     def test_kurtosis_score(self):
         assert_series_equal(self.scores_manually_calculated["kurtosis_score"].reset_index(drop=True),
                             self.scores["kurtosis_score"].reset_index(drop=True),check_less_precise = True) 
+        
     def test_skew_score(self):
         assert_series_equal(self.scores_manually_calculated["skew_score"].reset_index(drop=True),
-                            self.scores["skew_score"].reset_index(drop=True),check_less_precise = True)         
+                            self.scores["skew_score"].reset_index(drop=True),check_less_precise = True)  
+        
+    def test_flatness_score(self):
+        assert_series_equal(self.scores_manually_calculated["flatness_score"].reset_index(drop=True),
+                            self.scores["flatness_score"].reset_index(drop=True),check_less_precise = True)         
 if __name__ == '__main__':
     unittest.main()
     
@@ -119,7 +125,8 @@ if __name__ == '__main__':
     SacAnalysis = SaccadeAnalysis(processed_saccades,
                                       processed_average_saccade,
                                       histogram_vectors)
-    scores = SacAnalysis.GetScores()    
+    scores = SacAnalysis.GetScores() 
     """
+    
     
     
