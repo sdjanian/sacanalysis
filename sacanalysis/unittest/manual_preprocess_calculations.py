@@ -22,6 +22,7 @@ if __name__ == '__main__':
     velocity_1 = df["velocity"].iloc[0:6].values
     velocity_1_mean = velocity_1.mean()
     velocity_1_norm = velocity_1-velocity_1_mean    
+    velocity_1_z = stats.zscore(velocity_1_norm)
     
     ampl_1 = x_1[0]-x_1[-1] # ampl_1 is <0 so it is not flipped
     
@@ -40,7 +41,8 @@ if __name__ == '__main__':
 
     velocity_2 = df["velocity"].iloc[6:12].values
     velocity_2_mean = velocity_2.mean()
-    velocity_2_norm = velocity_2-velocity_2_mean    
+    velocity_2_norm = velocity_2-velocity_2_mean   
+    velocity_2_z = stats.zscore(velocity_2_norm)
     
     ampl_2 = x_2[0]-x_2[-1] 
     x_2_norm_up = x_2_norm # ampl_2 is <0 so it is not flipped
@@ -59,6 +61,7 @@ if __name__ == '__main__':
     velocity_3 = df["velocity"].iloc[12:18].values
     velocity_3_mean = velocity_3.mean()
     velocity_3_norm = velocity_3-velocity_3_mean    
+    velocity_3_z = stats.zscore(velocity_3_norm)
     
     ampl_3 = x_3[0]-x_3[-1] # ampl_3 is <0 so it is not flipped
     
@@ -78,6 +81,7 @@ if __name__ == '__main__':
     velocity_4 = df["velocity"].iloc[18:24].values
     velocity_4_mean = velocity_4.mean()
     velocity_4_norm = velocity_4-velocity_4_mean    
+    velocity_4_z = stats.zscore(velocity_4_norm)
     
     ampl_4 = x_4[0]-x_4[-1] # ampl_4 is >0 so it is not flipped
     
@@ -88,13 +92,18 @@ if __name__ == '__main__':
     mean_sac_x = [None]*6
     mean_sac_x_norm_up = [None]*6
     mean_sac_vel = [None]*6
+
     for i in np.arange(0,6): 
         mean_sac_x[i] = np.mean([x_1[i],x_2[i],x_3[i],x_4[i]])
         mean_sac_x_norm_up[i] = np.mean([x_1_norm_up[i],x_2_norm_up[i],x_3_norm_up[i],x_4_norm_up[i]])
         mean_sac_vel[i] = np.mean([velocity_1_norm[i],velocity_2_norm[i],velocity_3_norm[i],velocity_4_norm[i]])
-    
+        
     mean_sac_z = stats.zscore(mean_sac_x_norm_up)
-    df_mean_sac = pd.DataFrame({"x_z_trans":mean_sac_z,"x_norm_up":mean_sac_x_norm_up,"velocity_norm":mean_sac_vel})
+    mean_sac_vel_z = stats.zscore(mean_sac_vel) 
+    df_mean_sac = pd.DataFrame({"x_z_trans":mean_sac_z,
+                                "x_norm_up":mean_sac_x_norm_up,
+                                "velocity_norm":mean_sac_vel,
+                                "velocity_z_trans":mean_sac_vel_z})
     df_mean_sac.to_csv("20_ms_average_saccade_manual_calculation.csv")
     
     df_four_saccades = df.iloc[0:24]
@@ -104,6 +113,13 @@ if __name__ == '__main__':
     df_four_saccades["velocity_norm"] = np.concatenate((velocity_1_norm,velocity_2_norm,velocity_3_norm,velocity_4_norm),axis=None)
     df_four_saccades["x_norm_up"] = np.concatenate((x_1_norm_up,x_2_norm_up,x_3_norm_up,x_4_norm_up),axis=None)
     df_four_saccades["x_z_trans"] = np.concatenate((z_score_1,z_score_2,z_score_3,z_score_4),axis=None)
+    df_four_saccades["velocity_z_trans"] = np.concatenate((velocity_1_z,velocity_2_z,velocity_3_z,velocity_4_z),axis=None)
+    """
+        self.__saccadesToProcces.loc[:,"velocity_z_trans"] = self.__saccadesToProcces.groupby("unique_saccade_number")["velocity_norm"].transform(
+                lambda x: stats.zscore(x)
+                )    
+    """
+    #stats.zscore(x)
     df_four_saccades.to_csv("four_20_ms_saccades_preprocessed_output.csv")
     
     ##########################################################################

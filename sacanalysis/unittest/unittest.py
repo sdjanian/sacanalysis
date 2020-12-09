@@ -89,6 +89,8 @@ class TestSaccadeAnalysis(unittest.TestCase):
         assert_series_equal(self.scores_manually_calculated["residual_sum_velocity"].reset_index(drop=True),
                             self.scores["residual_sum_velocity"].reset_index(drop=True),check_less_precise = True)
         
+     
+        
     def test_vector(self):
         assert_series_equal(self.scores_manually_calculated["vector"].reset_index(drop=True),
                             self.scores["vector"].reset_index(drop=True),check_less_precise = True)       
@@ -107,7 +109,11 @@ class TestSaccadeAnalysis(unittest.TestCase):
         
     def test_flatness_score(self):
         assert_series_equal(self.scores_manually_calculated["flatness_score"].reset_index(drop=True),
-                            self.scores["flatness_score"].reset_index(drop=True),check_less_precise = True)         
+                            self.scores["flatness_score"].reset_index(drop=True),check_less_precise = True)      
+        
+    def test_residual_sum_velocity_z_trans(self):
+        assert_series_equal(self.scores_manually_calculated["residual_sum_velocity_z_trans"].reset_index(drop=True),
+                            self.scores["residual_sum_velocity_z_trans"].reset_index(drop=True),check_less_precise = True)           
 if __name__ == '__main__':
     unittest.main()
     

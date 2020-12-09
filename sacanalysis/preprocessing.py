@@ -161,16 +161,18 @@ class Preproccesing:
         # Average saccade position in z transformed domain
         average_saccade_z_score = pd.Series(data=stats.zscore(average_saccade_norm_deg),
                                             name = "x_z_trans",
-                                            index=average_saccade_norm_deg.index)
-        
-        # Average saccade velocity in z transformed domain
-        average_saccade_z_score_velocity = pd.Series(data=stats.zscore(average_saccade_norm_deg),
-                                    name = "velocity_z_trans",
-                                    index=average_saccade_norm_deg.index)
+                                            index=average_saccade_norm_deg.index)        
+
         
         average_saccade_velocity = self.__saccadesToProcces.groupby("norm_time")["velocity_norm"].apply(
                 lambda x: np.mean(x)
                 )
+        
+        # Average saccade velocity in z transformed domain
+        average_saccade_z_score_velocity = pd.Series(data=stats.zscore(average_saccade_velocity), # FEJL HER
+                                    name = "velocity_z_trans",
+                                    index=average_saccade_velocity.index)
+        
         # Average saccade dataframe
         average_saccade = pd.DataFrame([average_saccade_z_score,average_saccade_norm_deg,average_saccade_velocity,average_saccade_z_score_velocity]).T
     

@@ -26,6 +26,7 @@ if __name__ == '__main__':
                            "residual_sum_x_z_trans":[],
                            "residual_sum_x_norm_up":[],
                            "residual_sum_velocity":[],
+                           "residual_sum_velocity_z_trans":[],
                            "flatness_score":[],
                            "vector":[],
                            "dipvalue_score":[],
@@ -90,9 +91,25 @@ if __name__ == '__main__':
     scores["flatness_score"].iloc[1] =  flatness_calc(sac_2)
     scores["flatness_score"].iloc[2] =  flatness_calc(sac_3)
     scores["flatness_score"].iloc[3] =  flatness_calc(sac_4)    
+    
+    scores["residual_sum_velocity_z_trans"].iloc[0] =  np.mean(abs(sac_1["velocity_z_trans"].values - manual_calculated_average_saccade["velocity_z_trans"].values))
+    scores["residual_sum_velocity_z_trans"].iloc[1] =  np.mean(abs(sac_2["velocity_z_trans"].values - manual_calculated_average_saccade["velocity_z_trans"].values))
+    scores["residual_sum_velocity_z_trans"].iloc[2] =  np.mean(abs(sac_3["velocity_z_trans"].values - manual_calculated_average_saccade["velocity_z_trans"].values))
+    scores["residual_sum_velocity_z_trans"].iloc[3] =  np.mean(abs(sac_4["velocity_z_trans"].values - manual_calculated_average_saccade["velocity_z_trans"].values))
+
+    
 
     scores.to_json("scores_four_saccades_manually_calculated.json")
 
     #unique_saccade_number,source,residual_sum_x_z_trans,residual_sum_x_norm_up,residual_sum_velocity,flatness_score,vector,dipvalue_score,entropy_score,kurtosis_score,skew_score,bfvalue_score,ranked_residual_sum_x_z_trans,ranked_residual_sum_x_norm_up,ranked_residual_sum_velocity,ranked_flatness_score,ranked_dipvalue_score,ranked_entropy_score,ranked_kurtosis_score,ranked_skew_score
     
 
+"""
+        self.__saccades["residual_velocity_z_trans"] = self.__saccades.groupby("unique_saccade_number")["velocity_z_trans"].transform(
+                lambda x: abs(x-self.__average_saccade["velocity_z_trans"].values)
+                )   
+        
+        self.__scores["residual_sum_velocity_z_trans"] = self.__saccades.groupby("unique_saccade_number")["residual_velocity_z_trans"].apply(
+                lambda x:np.mean(x)
+                )
+"""
