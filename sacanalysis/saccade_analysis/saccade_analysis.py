@@ -35,14 +35,14 @@ class SaccadeAnalysis:
     Functions:
         GetResidualScore : 
             Returns a dataframe with all the preproccesed data added as
-            ['residual_sum_x_z_trans'       : Residual sum of the horizontal signal from average saccade in z-score transformation , 
-            'residual_sum_x_norm_up'        : Residual sum of the horizontal signal from average saccade in mean normalized transformation,
-            'residual_sum_velocity'         : Residual sum of the velocity from average saccade in degrees pr second,
-            'residual_sum_velocity_z_trans' : Residual sum of the velocity from average saccade in degrees pr second,
+            ['position_shape'       : Residual sum of the horizontal signal from average saccade in z-score transformation , 
+            'position_shape_amplitude'        : Residual sum of the horizontal signal from average saccade in mean normalized transformation,
+            'velocity_shape_amplitude'         : Residual sum of the velocity from average saccade in degrees pr second,
+            'velocity_shape' : Residual sum of the velocity from average saccade in degrees pr second,
             'flatness_score'                : The flatness of a saccade by measuring the lowest dispersion with a rolling window,
-            'ranked_residual_sum_x_z_trans' : Rankings of each saccade by residual_sum_x_z_trans with 1 being best ranked,
-            'ranked_residual_sum_x_norm_up' : Rankings of each saccade by residual_sum_x_norm_up with 1 being best ranked,
-            'ranked_residual_sum_velocity'  : Rankings of each saccade by residual_sum_velocity with 1 being best ranked,
+            'ranked_position_shape' : Rankings of each saccade by position_shape with 1 being best ranked,
+            'ranked_position_shape_amplitude' : Rankings of each saccade by position_shape_amplitude with 1 being best ranked,
+            'ranked_velocity_shape_amplitude'  : Rankings of each saccade by velocity_shape_amplitude with 1 being best ranked,
             'ranked_flatness_score'         : Rankings of each saccade by flatness_score with 1 being best ranked]
             and each row is a timestamp sample of a saccade.
             'dipvalue_score'                : Hartigans Diptest value for a histogram of the velocity 
@@ -94,7 +94,7 @@ class SaccadeAnalysis:
                 lambda x: abs(x-self.__average_saccade["x_z_trans"].values)
                 )   
         
-        self.__scores["residual_sum_x_z_trans"] = self.__saccades.groupby("unique_saccade_number")["residual_x_z_trans"].apply(
+        self.__scores["position_shape"] = self.__saccades.groupby("unique_saccade_number")["residual_x_z_trans"].apply(
                 lambda x:np.mean(x)
                 )
         
@@ -103,7 +103,7 @@ class SaccadeAnalysis:
                 lambda x: abs(x-self.__average_saccade["velocity_z_trans"].values)
                 )   
         
-        self.__scores["residual_sum_velocity_z_trans"] = self.__saccades.groupby("unique_saccade_number")["residual_velocity_z_trans"].apply(
+        self.__scores["velocity_shape"] = self.__saccades.groupby("unique_saccade_number")["residual_velocity_z_trans"].apply(
                 lambda x:np.mean(x)
                 )
         
@@ -113,7 +113,7 @@ class SaccadeAnalysis:
                 lambda x:  abs(x-self.__average_saccade["x_norm_up"].values)
                 ) 
         # Calculate the sum of the residuals
-        self.__scores["residual_sum_x_norm_up"] = self.__saccades.groupby("unique_saccade_number")["residual_x_norm_up"].apply(
+        self.__scores["position_shape_amplitude"] = self.__saccades.groupby("unique_saccade_number")["residual_x_norm_up"].apply(
                 lambda x:np.mean(x)
                 )        
     
@@ -126,7 +126,7 @@ class SaccadeAnalysis:
                 lambda x:  abs(x-self.__average_saccade["velocity_norm"].values)
                 )
         # Calculate the sum of the residuals
-        self.__scores["residual_sum_velocity"] = self.__saccades.groupby("unique_saccade_number")["residual_velocity"].apply(
+        self.__scores["velocity_shape_amplitude"] = self.__saccades.groupby("unique_saccade_number")["residual_velocity"].apply(
                     lambda x:np.mean(x)
                     )
 
@@ -203,13 +203,13 @@ class SaccadeAnalysis:
     def GetScores(self,windows_size: int=3) -> pd.DataFrame:
         """
             Returns a dataframe with all the preproccesed data added as
-            ['residual_sum_x_z_trans'       : Residual sum of the horizontal signal from average saccade in z-score transformation , 
-            'residual_sum_x_norm_up'        : Residual sum of the horizontal signal from average saccade in mean normalized transformation,
-            'residual_sum_velocity'         : Residual sum of the velocity from average saccade in degrees pr second,
+            ['position_shape'       : Residual sum of the horizontal signal from average saccade in z-score transformation , 
+            'position_shape_amplitude'        : Residual sum of the horizontal signal from average saccade in mean normalized transformation,
+            'velocity_shape_amplitude'         : Residual sum of the velocity from average saccade in degrees pr second,
             'flatness_score'                : The flatness of a saccade by measuring the lowest dispersion with a rolling window,
-            'ranked_residual_sum_x_z_trans' : Rankings of each saccade by residual_sum_x_z_trans with 1 being best ranked,
-            'ranked_residual_sum_x_norm_up' : Rankings of each saccade by residual_sum_x_norm_up with 1 being best ranked,
-            'ranked_residual_sum_velocity'  : Rankings of each saccade by residual_sum_velocity with 1 being best ranked,
+            'ranked_position_shape' : Rankings of each saccade by position_shape with 1 being best ranked,
+            'ranked_position_shape_amplitude' : Rankings of each saccade by position_shape_amplitude with 1 being best ranked,
+            'ranked_velocity_shape_amplitude'  : Rankings of each saccade by velocity_shape_amplitude with 1 being best ranked,
             'ranked_flatness_score'         : Rankings of each saccade by flatness_score with 1 being best ranked]
             and each row is a timestamp sample of a saccade.
             'dipvalue_score'                : Hartigans Diptest value for a histogram of the velocity 

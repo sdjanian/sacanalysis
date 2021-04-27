@@ -37,9 +37,9 @@ def GetCorrectTransformationToUseInAnalysis(score_column:str) -> str:
         Output:
             str: Is either mean normalized upwards saccade or z-score tranformed of the a mean normalized upwards saccade
     """
-    if any(map(lambda x: x in  score_column,["main", "velocity","x_norm_up","velocity","dip","entropy","kurtosis","skew","bfvalue"])):
+    if any(map(lambda x: x in  score_column,["main", "velocity","position_shape_amplitude","velocity","dip","entropy","kurtosis","skew","bfvalue"])):
         transformation_column = "x_norm_up"
-    elif any(map(lambda x: x in  score_column,["x_z_trans", "flatness"])):
+    elif any(map(lambda x: x in  score_column,["position_shape", "flatness"])):
         transformation_column = "x_z_trans"
     return transformation_column    
 

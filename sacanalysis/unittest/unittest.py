@@ -77,17 +77,17 @@ class TestSaccadeAnalysis(unittest.TestCase):
 
         
    
-    def test_residual_sum_x_z_trans(self):
-        assert_series_equal(self.scores_manually_calculated["residual_sum_x_z_trans"].reset_index(drop=True),
-                            self.scores["residual_sum_x_z_trans"].reset_index(drop=True),check_less_precise = True)
+    def test_position_shape(self):
+        assert_series_equal(self.scores_manually_calculated["position_shape"].reset_index(drop=True),
+                            self.scores["position_shape"].reset_index(drop=True),check_less_precise = True)
 
-    def test_residual_sum_x_norm_up(self):
-        assert_series_equal(self.scores_manually_calculated["residual_sum_x_norm_up"].reset_index(drop=True),
-                            self.scores["residual_sum_x_norm_up"].reset_index(drop=True),check_less_precise = True)
+    def test_position_shape_amplitude(self):
+        assert_series_equal(self.scores_manually_calculated["position_shape_amplitude"].reset_index(drop=True),
+                            self.scores["position_shape_amplitude"].reset_index(drop=True),check_less_precise = True)
 
-    def test_residual_sum_velocity(self):
-        assert_series_equal(self.scores_manually_calculated["residual_sum_velocity"].reset_index(drop=True),
-                            self.scores["residual_sum_velocity"].reset_index(drop=True),check_less_precise = True)
+    def test_velocity_shape_amplitude(self):
+        assert_series_equal(self.scores_manually_calculated["velocity_shape_amplitude"].reset_index(drop=True),
+                            self.scores["velocity_shape_amplitude"].reset_index(drop=True),check_less_precise = True)
         
      
         
@@ -111,13 +111,13 @@ class TestSaccadeAnalysis(unittest.TestCase):
         assert_series_equal(self.scores_manually_calculated["flatness_score"].reset_index(drop=True),
                             self.scores["flatness_score"].reset_index(drop=True),check_less_precise = True)      
         
-    def test_residual_sum_velocity_z_trans(self):
-        assert_series_equal(self.scores_manually_calculated["residual_sum_velocity_z_trans"].reset_index(drop=True),
-                            self.scores["residual_sum_velocity_z_trans"].reset_index(drop=True),check_less_precise = True)           
+    def test_velocity_shape(self):
+        assert_series_equal(self.scores_manually_calculated["velocity_shape"].reset_index(drop=True),
+                            self.scores["velocity_shape"].reset_index(drop=True),check_less_precise = True)           
 if __name__ == '__main__':
     unittest.main()
     
-    """
+    
     manual_calculated_average_saccade = pd.read_csv("20_ms_average_saccade_manual_calculation.csv")
     four_saccades_for_input = pd.read_csv("four_20_ms_saccades.csv")
     four_saccades_correct_output = pd.read_csv("four_20_ms_saccades_preprocessed_output.csv")
@@ -132,7 +132,7 @@ if __name__ == '__main__':
                                       processed_average_saccade,
                                       histogram_vectors)
     scores = SacAnalysis.GetScores() 
-    """
+    
     
     
     
