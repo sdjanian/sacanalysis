@@ -1,2 +1,4 @@
 from .saccade_plots import plotRankedSaccades
+from .saccade_plots import __plotRankedSaccadesArticle
+from .saccade_plots import __plotRankedSaccadesAndDistributionsArticle
 from .plotting_class import Plotting_class

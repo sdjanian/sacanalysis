@@ -3,5 +3,7 @@ from .calculateEvents import CalculateEventDurationClass
 from .preprocessing import Preproccesing
 from .saccade_plots import plotRankedSaccades
 from .saccade_plots import Plotting_class
+from .saccade_plots import __plotRankedSaccadesArticle
+from .saccade_plots import __plotRankedSaccadesAndDistributionsArticle
 from .saccade_analysis import SaccadeAnalysis
 from .utility import GetVelocity

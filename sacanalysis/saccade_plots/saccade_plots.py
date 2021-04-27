@@ -39,7 +39,7 @@ def plotRankedSaccades(saccades,average_saccade,ranked_residual,save_dir_sub,sac
             plt.savefig(os.path.join(save_dir_sub,"saccade_rank_page_"+str(page+1)+".pdf"))
             plt.close() 
 
-def plotRankedSaccadesArticle(saccades,average_saccade,ranked_residual,save_dir_sub,saccade_pos_col="",
+def __plotRankedSaccadesArticle(saccades,average_saccade,ranked_residual,save_dir_sub,saccade_pos_col="",
                        sup_title="",metric="",_nrow=8,_ncol=3,_figsize=(6,15),num_of_ranks=0,list_of_ranks_to_plot=[]):
 
         ii = 0
@@ -69,7 +69,7 @@ def plotRankedSaccadesArticle(saccades,average_saccade,ranked_residual,save_dir_
         plt.tight_layout(rect=[0, 0.03, 1, 0.95])
         #plt.close()         
         
-def plotRankedSaccadesAndDistributionsArticle(saccades,average_saccade,ranked_residual,save_dir_sub,saccade_pos_col="",
+def __plotRankedSaccadesAndDistributionsArticle(saccades,average_saccade,ranked_residual,save_dir_sub,saccade_pos_col="",
                        sup_title="",metric="",_nrow=8,_ncol=3,_figsize=(6,15),num_of_ranks=0,list_of_ranks_to_plot=[]):
 
         ii = 0
