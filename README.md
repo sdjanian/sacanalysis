@@ -1,6 +1,6 @@
 # Manualy labelled saccade analysis
 
-These are scientific scripts for how well saccades have been labelled. It uses the GazeCom dataset but another dataset can be used as long as the dataframe used is in the correct format.
+These are scientific scripts for how well saccades have been labelled. It uses the GazeCom dataset but another dataset can be used as long as the dataframe used is in the correct format. The GazeCom dataset can be found [here](http://michaeldorr.de/smoothpursuit/deep_eye_movement_classification_package.zip). The correct folder can be found at deep_eye_movement_classification_package --> data --> inputs --> GazeCom_all_features.zip. If default pathing is wanted place the GazeCom_all_features folder in the same folder as ```python main.py```.
 
 This is an example of how the data should be formated with corresponding column names. It contains the time of the recording in miliseconds, the and x and y coordinates of the eye movements, handlabeller_final is the eye movement class, the velocity and source is the file name and subject is the subjects identifier.
 | time  | x | y | handlabeller_final | velocity | source | subject |
