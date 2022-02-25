@@ -4,7 +4,6 @@ from scipy.stats import entropy, kurtosis, skew
 from collections import Counter
 
 from .get_dip import getDip
-from .rjmcmc import rjmcmc_output
 from ..utility.error_handling import xyTimeVelocityCheck, sourceCheck
 
 class SaccadeAnalysis:
@@ -35,22 +34,20 @@ class SaccadeAnalysis:
     Functions:
         GetResidualScore : 
             Returns a dataframe with all the preproccesed data added as
-            ['position_shape'       : Residual sum of the horizontal signal from average saccade in z-score transformation , 
-            'position_shape_amplitude'        : Residual sum of the horizontal signal from average saccade in mean normalized transformation,
-            'velocity_shape_amplitude'         : Residual sum of the velocity from average saccade in degrees pr second,
-            'velocity_shape' : Residual sum of the velocity from average saccade in degrees pr second,
+            ['position_shape_score'       : Residual sum of the horizontal signal from average saccade in z-score transformation , 
+            'position_shape_amplitude_score'        : Residual sum of the horizontal signal from average saccade in mean normalized transformation,
+            'velocity_shape_amplitude_score'         : Residual sum of the velocity from average saccade in degrees pr second,
+            'velocity_shape_score' : Residual sum of the velocity from average saccade in degrees pr second,
             'flatness_score'                : The flatness of a saccade by measuring the lowest dispersion with a rolling window,
-            'ranked_position_shape' : Rankings of each saccade by position_shape with 1 being best ranked,
-            'ranked_position_shape_amplitude' : Rankings of each saccade by position_shape_amplitude with 1 being best ranked,
-            'ranked_velocity_shape_amplitude'  : Rankings of each saccade by velocity_shape_amplitude with 1 being best ranked,
+            'ranked_position_shape' : Rankings of each saccade by position_shape_score with 1 being best ranked,
+            'ranked_position_shape_amplitude' : Rankings of each saccade by position_shape_amplitude_score with 1 being best ranked,
+            'ranked_velocity_shape_amplitude_score'  : Rankings of each saccade by velocity_shape_amplitude_score with 1 being best ranked,
             'ranked_flatness_score'         : Rankings of each saccade by flatness_score with 1 being best ranked]
             and each row is a timestamp sample of a saccade.
             'dipvalue_score'                : Hartigans Diptest value for a histogram of the velocity 
             'entropy_score'                 : Shanons entropy for a histogram of the velocity
             'kurtosis_score'                : Kurtosis for a histogram of the velocity
             'skew'                          : Skew for a histogram of the velocity
-            'bfvalue_score'                 : Bayesian Factor for a histogram of the velocity calculated using Reversible Jump Markov Chain Monte Carlo 
-                                              for https://pdfs.semanticscholar.org/29a4/f9cd5faa12593ac13d0349ba842d48eb792a.pdf
 
         
     """    
@@ -83,9 +80,7 @@ class SaccadeAnalysis:
         self.__CalculateEntropy()
         self.__CalculateKurtosis()
         self.__CalculateSkew()
-        self.__CalculateBFValue()
 
-        # REMEMBER TO ADD MAIN SEQUENCE ANALYSIS
         self.__RankScores()
         
     def __ResidualZScoreSaccade(self) -> None:
@@ -94,7 +89,7 @@ class SaccadeAnalysis:
                 lambda x: abs(x-self.__average_saccade["x_z_trans"].values)
                 )   
         
-        self.__scores["position_shape"] = self.__saccades.groupby("unique_saccade_number")["residual_x_z_trans"].apply(
+        self.__scores["position_shape_score"] = self.__saccades.groupby("unique_saccade_number")["residual_x_z_trans"].apply(
                 lambda x:np.mean(x)
                 )
         
@@ -103,7 +98,7 @@ class SaccadeAnalysis:
                 lambda x: abs(x-self.__average_saccade["velocity_z_trans"].values)
                 )   
         
-        self.__scores["velocity_shape"] = self.__saccades.groupby("unique_saccade_number")["residual_velocity_z_trans"].apply(
+        self.__scores["velocity_shape_score"] = self.__saccades.groupby("unique_saccade_number")["residual_velocity_z_trans"].apply(
                 lambda x:np.mean(x)
                 )
         
@@ -113,7 +108,7 @@ class SaccadeAnalysis:
                 lambda x:  abs(x-self.__average_saccade["x_norm_up"].values)
                 ) 
         # Calculate the sum of the residuals
-        self.__scores["position_shape_amplitude"] = self.__saccades.groupby("unique_saccade_number")["residual_x_norm_up"].apply(
+        self.__scores["position_shape_amplitude_score"] = self.__saccades.groupby("unique_saccade_number")["residual_x_norm_up"].apply(
                 lambda x:np.mean(x)
                 )        
     
@@ -126,7 +121,7 @@ class SaccadeAnalysis:
                 lambda x:  abs(x-self.__average_saccade["velocity_norm"].values)
                 )
         # Calculate the sum of the residuals
-        self.__scores["velocity_shape_amplitude"] = self.__saccades.groupby("unique_saccade_number")["residual_velocity"].apply(
+        self.__scores["velocity_shape_amplitude_score"] = self.__saccades.groupby("unique_saccade_number")["residual_velocity"].apply(
                     lambda x:np.mean(x)
                     )
 
@@ -150,11 +145,7 @@ class SaccadeAnalysis:
         self.__scores["entropy_score"] = self.__scores["vector"].apply(
                lambda x: entropy(list(Counter(x).values()),base=2)
                )       
-
-    def __CalculateBFValue(self) -> None:
-       self.__scores["bfvalue_score"] = self.__scores["vector"].apply(
-               lambda x: rjmcmc_output(np.expand_dims(np.array(x),axis=1))
-               )        
+       
 
     def __CalculateSkew(self) -> None:
        self.__scores["skew_score"] = self.__scores["vector"].apply(
@@ -170,7 +161,6 @@ class SaccadeAnalysis:
         self.__scores = self.__scores.sort_values(by=["unique_saccade_number"])
         self.__histogram_velocity_vector = self.__histogram_velocity_vector.sort_values(by=["unique_saccade_number"])
         self.__scores["vector"] = self.__histogram_velocity_vector["vector"].values
-        #self.__scores = self.__scores.merge(self.__histogram_velocity_vector[["unique_saccade_number","vector"]],on="unique_saccade_number")
         
     def __RankScores(self) -> None:
         """
@@ -203,21 +193,19 @@ class SaccadeAnalysis:
     def GetScores(self,windows_size: int=3) -> pd.DataFrame:
         """
             Returns a dataframe with all the preproccesed data added as
-            ['position_shape'       : Residual sum of the horizontal signal from average saccade in z-score transformation , 
-            'position_shape_amplitude'        : Residual sum of the horizontal signal from average saccade in mean normalized transformation,
-            'velocity_shape_amplitude'         : Residual sum of the velocity from average saccade in degrees pr second,
+            ['position_shape_score'       : Residual sum of the horizontal signal from average saccade in z-score transformation , 
+            'position_shape_amplitude_score'        : Residual sum of the horizontal signal from average saccade in mean normalized transformation,
+            'velocity_shape_amplitude_score'         : Residual sum of the velocity from average saccade in degrees pr second,
             'flatness_score'                : The flatness of a saccade by measuring the lowest dispersion with a rolling window,
-            'ranked_position_shape' : Rankings of each saccade by position_shape with 1 being best ranked,
-            'ranked_position_shape_amplitude' : Rankings of each saccade by position_shape_amplitude with 1 being best ranked,
-            'ranked_velocity_shape_amplitude'  : Rankings of each saccade by velocity_shape_amplitude with 1 being best ranked,
+            'ranked_position_shape' : Rankings of each saccade by position_shape_score with 1 being best ranked,
+            'ranked_position_shape_amplitude' : Rankings of each saccade by position_shape_amplitude_score with 1 being best ranked,
+            'ranked_velocity_shape_amplitude_score'  : Rankings of each saccade by velocity_shape_amplitude_score with 1 being best ranked,
             'ranked_flatness_score'         : Rankings of each saccade by flatness_score with 1 being best ranked]
             and each row is a timestamp sample of a saccade.
             'dipvalue_score'                : Hartigans Diptest value for a histogram of the velocity 
             'entropy_score'                 : Shanons entropy for a histogram of the velocity
             'kurtosis_score'                : Kurtosis for a histogram of the velocity
-            'skew'                          : Skew for a histogram of the velocity
-            'bfvalue_score']                : Bayesian Factor for a histogram of the velocity calculated using Reversible Jump Markov Chain Monte Carlo 
-                                              for https://pdfs.semanticscholar.org/29a4/f9cd5faa12593ac13d0349ba842d48eb792a.pdf
+            'skew'                          : Skew for a histogram of the velocity ]
             and each row is a timestamp sample of a saccade.
         """
         self.__CalcuateScores(windows_size)

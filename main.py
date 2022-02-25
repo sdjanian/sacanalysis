@@ -6,9 +6,6 @@ import numpy as np
 import random
 import tqdm
 import os
-import winsound
-beep_duration = 1000  # millisecond
-freq = 440  # Hz
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -85,9 +82,10 @@ if __name__ == "__main__":
     random.seed(10)
     # Load GazeCom and calculate events
     if 'df' not in locals():
-        load_gazecom = Load_gazecom(r"D:\Produkt- og Designpsykologi\9. Semester\4. Extendend Masters\GazeCom_Data\all_features")
+        load_gazecom = Load_gazecom()
         df = load_gazecom.load_all_data(unit_for_time="milli")
         df = df.rename(columns = {"speed_1":"velocity"})
+        df = df[['time', 'x', 'y', 'handlabeller_final', 'velocity', 'source', 'subject']]
     
     CEvents = CalculateEventDurationClass()
     if 'event_df' not in locals():
@@ -99,23 +97,24 @@ if __name__ == "__main__":
     end_dur = 104
     eye_tracker_frequency = 250
     save_dir = "output"
-    produce_plots_bool = False # Produce pdf of all ranked saccades
+    produce_plots_bool = True # Produce pdf of all ranked saccades
     one_sample_duration = int(1000/eye_tracker_frequency)
     if not os.path.isdir(save_dir):
         os.makedirs(save_dir)    
     
     
     ### Setting arrays    
-    durations = np.arange(start_dur,end_dur,one_sample_duration)
+    durations =  [20,40,60]#np.arange(start_dur,end_dur,one_sample_duration)
     average_saccade_list = []
     residual_df_list = []    
 
+    # Loop through selected saccade durations
     for duration in tqdm.tqdm(durations,position=0,leave=False,desc = "Analysing saccades"):
         sub = str(duration)+"ms"
         save_dir_sub = os.path.join(save_dir,sub)
         
         sub_event_df = event_df[event_df["event_duration"]==duration]
-        # Make the analysis op the saccades and store results
+        # Make the analysis of the saccades and store results
         extracted_saccades = CEvents.extractEventsToDdf(df,sub_event_df,event_label = load_gazecom.class_event_gazecom["Saccade"],verbose=0)
         
         Preprocess = Preproccesing(extracted_saccades)
@@ -127,6 +126,7 @@ if __name__ == "__main__":
         scores = _SaccadeAnalysis.GetScores()        
         scores_column_list = GetScoreListToLoopThrough(scores)
         if produce_plots_bool==True:
+            # Loop through each of the saccade scores, produce ranked plots and save scores for each saccade of selected duration
             for score_column in scores_column_list:
                 sub_score = scores[["unique_saccade_number",
                                     "ranked_"+score_column,
@@ -158,4 +158,3 @@ if __name__ == "__main__":
         scores_with_samp = AddSaccadeSamplesToScore(scores,processed_saccades) # Add the saccade samples as columns samp_0...samp_n to each row                
         SaveResultsAsCsv(scores_with_samp,save_dir,"scores",sub)  
 
-    #winsound.Beep(freq+10, beep_duration)

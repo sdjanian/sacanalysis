@@ -1,7 +1,6 @@
 # Python libraries
 import pandas as pd
 import numpy as np
-import copy
 from scipy import stats
 from .utility import getTimeinSec
 
@@ -145,6 +144,9 @@ class Preproccesing:
                 lambda x: stats.zscore(x)
                 )           
     def __CalcuateAvergeSaccade(self) -> pd.DataFrame:
+        """
+        Create a composite average saccade        
+        """
         
         # Average saccade in normalized degrees
         average_saccade_norm_deg = self.__saccadesToProcces.groupby("norm_time")["x_norm_up"].apply(
@@ -179,6 +181,15 @@ class Preproccesing:
         return average_saccade
     
     def __GenerateHistogramVector(self) -> pd.DataFrame:
+        """
+        Create a histogram of the velocity of saccades.
+
+        Returns
+        -------
+        TYPE
+            DESCRIPTION.
+
+        """
 
         
         def vectorizeHelperFunction(x):            

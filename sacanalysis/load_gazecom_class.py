@@ -1,4 +1,3 @@
-import winsound
 import glob
 import pandas as pd
 from scipy.io import arff
@@ -7,8 +6,7 @@ import tqdm
 import math
 import warnings
 import os
-duration = 1000  # millisecond
-freq = 440  # Hz
+
 
 class Load_gazecom:
     _CLEAN_TIME_LIMIT = 21 * 1e6
@@ -24,9 +22,9 @@ class Load_gazecom:
                     'Smooth Pursuit':3,
                     'Noise':4}
        
-    def __init__(self, GAZECOM_PATH = '..\GazeCom_Data\\all_features'):
+    def __init__(self, GAZECOM_PATH = 'GazeCom_Data\\all_features'):
         """
-        :param GAZECOM_PATH: Path where the GazeCom dataset is located. By default set to '..\GazeCom_Data\all_features'
+        :param GAZECOM_PATH: Path where the GazeCom dataset is located. By default set to '\GazeCom_Data\all_features'
         """
         self.GAZECOM_PATH = GAZECOM_PATH
       
@@ -127,6 +125,9 @@ class Load_gazecom:
     @staticmethod
     def _calculate_ppd(skip_consistency_check=False):
         """
+        Original code from https://github.com/MikhailStartsev/sp_tool/blob/master/util.py and has been rewritten to fit this code.
+        Documentation copy pasted from original code:
+            
         Pixel-per-degree value is computed as an average of pixel-per-degree values for each dimension (X and Y).
     
         :param arff_object: arff object, i.e. a dictionary that includes the 'metadata' key.
@@ -183,5 +184,4 @@ class Load_gazecom:
 if __name__ == "__main__":
     load_gazecom = Load_gazecom(GAZECOM_PATH = '..\GazeCom_Data\\all_features')
     df = load_gazecom.load_all_data()
-    load_gazecom.saveRecordingsAsIndividualFiles(path=r"C:\Users\FQ73OO\OneDrive - Aalborg Universitet\Eye_tracking\GazeComCritique.git\output")
-    winsound.Beep(freq+10, duration)
+    load_gazecom.saveRecordingsAsIndividualFiles(path=r"\output")

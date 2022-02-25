@@ -78,16 +78,16 @@ class TestSaccadeAnalysis(unittest.TestCase):
         
    
     def test_position_shape(self):
-        assert_series_equal(self.scores_manually_calculated["position_shape"].reset_index(drop=True),
-                            self.scores["position_shape"].reset_index(drop=True),check_less_precise = True)
+        assert_series_equal(self.scores_manually_calculated["position_shape_score"].reset_index(drop=True),
+                            self.scores["position_shape_score"].reset_index(drop=True),check_less_precise = True)
 
     def test_position_shape_amplitude(self):
-        assert_series_equal(self.scores_manually_calculated["position_shape_amplitude"].reset_index(drop=True),
-                            self.scores["position_shape_amplitude"].reset_index(drop=True),check_less_precise = True)
+        assert_series_equal(self.scores_manually_calculated["position_shape_amplitude_score"].reset_index(drop=True),
+                            self.scores["position_shape_amplitude_score"].reset_index(drop=True),check_less_precise = True)
 
     def test_velocity_shape_amplitude(self):
-        assert_series_equal(self.scores_manually_calculated["velocity_shape_amplitude"].reset_index(drop=True),
-                            self.scores["velocity_shape_amplitude"].reset_index(drop=True),check_less_precise = True)
+        assert_series_equal(self.scores_manually_calculated["velocity_shape_amplitude_score"].reset_index(drop=True),
+                            self.scores["velocity_shape_amplitude_score"].reset_index(drop=True),check_less_precise = True)
         
      
         
@@ -112,8 +112,8 @@ class TestSaccadeAnalysis(unittest.TestCase):
                             self.scores["flatness_score"].reset_index(drop=True),check_less_precise = True)      
         
     def test_velocity_shape(self):
-        assert_series_equal(self.scores_manually_calculated["velocity_shape"].reset_index(drop=True),
-                            self.scores["velocity_shape"].reset_index(drop=True),check_less_precise = True)           
+        assert_series_equal(self.scores_manually_calculated["velocity_shape_score"].reset_index(drop=True),
+                            self.scores["velocity_shape_score"].reset_index(drop=True),check_less_precise = True)           
 if __name__ == '__main__':
     unittest.main()
     

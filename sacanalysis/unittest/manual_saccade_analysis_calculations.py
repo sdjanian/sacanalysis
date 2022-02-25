@@ -23,10 +23,10 @@ if __name__ == '__main__':
     
     scores = pd.DataFrame({"unique_saccade_number":[],
                            "source":[],
-                           "position_shape":[],
-                           "position_shape_amplitude":[],
-                           "velocity_shape_amplitude":[],
-                           "velocity_shape":[],
+                           "position_shape_score":[],
+                           "position_shape_amplitude_score":[],
+                           "velocity_shape_amplitude_score":[],
+                           "velocity_shape_score":[],
                            "flatness_score":[],
                            "vector":[],
                            "dipvalue_score":[],
@@ -44,20 +44,20 @@ if __name__ == '__main__':
     scores["unique_saccade_number"].iloc[2] = sac_3["unique_saccade_number"].iloc[0]
     scores["unique_saccade_number"].iloc[3] = sac_4["unique_saccade_number"].iloc[0]
 
-    scores["position_shape"].iloc[0] = np.mean(abs(sac_1["x_z_trans"].values - manual_calculated_average_saccade["x_z_trans"].values))
-    scores["position_shape"].iloc[1] = np.mean(abs(sac_2["x_z_trans"].values - manual_calculated_average_saccade["x_z_trans"].values))
-    scores["position_shape"].iloc[2] = np.mean(abs(sac_3["x_z_trans"].values - manual_calculated_average_saccade["x_z_trans"].values))
-    scores["position_shape"].iloc[3] = np.mean(abs(sac_4["x_z_trans"].values - manual_calculated_average_saccade["x_z_trans"].values))
+    scores["position_shape_score"].iloc[0] = np.mean(abs(sac_1["x_z_trans"].values - manual_calculated_average_saccade["x_z_trans"].values))
+    scores["position_shape_score"].iloc[1] = np.mean(abs(sac_2["x_z_trans"].values - manual_calculated_average_saccade["x_z_trans"].values))
+    scores["position_shape_score"].iloc[2] = np.mean(abs(sac_3["x_z_trans"].values - manual_calculated_average_saccade["x_z_trans"].values))
+    scores["position_shape_score"].iloc[3] = np.mean(abs(sac_4["x_z_trans"].values - manual_calculated_average_saccade["x_z_trans"].values))
 
-    scores["position_shape_amplitude"].iloc[0] =  np.mean(abs(sac_1["x_norm_up"].values - manual_calculated_average_saccade["x_norm_up"].values))
-    scores["position_shape_amplitude"].iloc[1] =  np.mean(abs(sac_2["x_norm_up"].values - manual_calculated_average_saccade["x_norm_up"].values))
-    scores["position_shape_amplitude"].iloc[2] =  np.mean(abs(sac_3["x_norm_up"].values - manual_calculated_average_saccade["x_norm_up"].values))
-    scores["position_shape_amplitude"].iloc[3] =  np.mean(abs(sac_4["x_norm_up"].values - manual_calculated_average_saccade["x_norm_up"].values))
+    scores["position_shape_amplitude_score"].iloc[0] =  np.mean(abs(sac_1["x_norm_up"].values - manual_calculated_average_saccade["x_norm_up"].values))
+    scores["position_shape_amplitude_score"].iloc[1] =  np.mean(abs(sac_2["x_norm_up"].values - manual_calculated_average_saccade["x_norm_up"].values))
+    scores["position_shape_amplitude_score"].iloc[2] =  np.mean(abs(sac_3["x_norm_up"].values - manual_calculated_average_saccade["x_norm_up"].values))
+    scores["position_shape_amplitude_score"].iloc[3] =  np.mean(abs(sac_4["x_norm_up"].values - manual_calculated_average_saccade["x_norm_up"].values))
 
-    scores["velocity_shape_amplitude"].iloc[0] =  np.mean(abs(sac_1["velocity_norm"].values - manual_calculated_average_saccade["velocity_norm"].values))
-    scores["velocity_shape_amplitude"].iloc[1] =  np.mean(abs(sac_2["velocity_norm"].values - manual_calculated_average_saccade["velocity_norm"].values))
-    scores["velocity_shape_amplitude"].iloc[2] =  np.mean(abs(sac_3["velocity_norm"].values - manual_calculated_average_saccade["velocity_norm"].values))
-    scores["velocity_shape_amplitude"].iloc[3] =  np.mean(abs(sac_4["velocity_norm"].values - manual_calculated_average_saccade["velocity_norm"].values))
+    scores["velocity_shape_amplitude_score"].iloc[0] =  np.mean(abs(sac_1["velocity_norm"].values - manual_calculated_average_saccade["velocity_norm"].values))
+    scores["velocity_shape_amplitude_score"].iloc[1] =  np.mean(abs(sac_2["velocity_norm"].values - manual_calculated_average_saccade["velocity_norm"].values))
+    scores["velocity_shape_amplitude_score"].iloc[2] =  np.mean(abs(sac_3["velocity_norm"].values - manual_calculated_average_saccade["velocity_norm"].values))
+    scores["velocity_shape_amplitude_score"].iloc[3] =  np.mean(abs(sac_4["velocity_norm"].values - manual_calculated_average_saccade["velocity_norm"].values))
 
     scores["kurtosis_score"].iloc[0] =  kurtosis(four_saccades_correct_vector["vector"].iloc[0],fisher=False)
     scores["kurtosis_score"].iloc[1] =  kurtosis(four_saccades_correct_vector["vector"].iloc[1],fisher=False)
@@ -92,16 +92,14 @@ if __name__ == '__main__':
     scores["flatness_score"].iloc[2] =  flatness_calc(sac_3)
     scores["flatness_score"].iloc[3] =  flatness_calc(sac_4)    
     
-    scores["velocity_shape"].iloc[0] =  np.mean(abs(sac_1["velocity_z_trans"].values - manual_calculated_average_saccade["velocity_z_trans"].values))
-    scores["velocity_shape"].iloc[1] =  np.mean(abs(sac_2["velocity_z_trans"].values - manual_calculated_average_saccade["velocity_z_trans"].values))
-    scores["velocity_shape"].iloc[2] =  np.mean(abs(sac_3["velocity_z_trans"].values - manual_calculated_average_saccade["velocity_z_trans"].values))
-    scores["velocity_shape"].iloc[3] =  np.mean(abs(sac_4["velocity_z_trans"].values - manual_calculated_average_saccade["velocity_z_trans"].values))
-
-    
-
+    scores["velocity_shape_score"].iloc[0] =  np.mean(abs(sac_1["velocity_z_trans"].values - manual_calculated_average_saccade["velocity_z_trans"].values))
+    scores["velocity_shape_score"].iloc[1] =  np.mean(abs(sac_2["velocity_z_trans"].values - manual_calculated_average_saccade["velocity_z_trans"].values))
+    scores["velocity_shape_score"].iloc[2] =  np.mean(abs(sac_3["velocity_z_trans"].values - manual_calculated_average_saccade["velocity_z_trans"].values))
+    scores["velocity_shape_score"].iloc[3] =  np.mean(abs(sac_4["velocity_z_trans"].values - manual_calculated_average_saccade["velocity_z_trans"].values))            
+            
     scores.to_json("scores_four_saccades_manually_calculated.json")
 
-    #unique_saccade_number,source,position_shape,position_shape_amplitude,velocity_shape_amplitude,flatness_score,vector,dipvalue_score,entropy_score,kurtosis_score,skew_score,bfvalue_score,ranked_position_shape,ranked_position_shape_amplitude,ranked_velocity_shape_amplitude,ranked_flatness_score,ranked_dipvalue_score,ranked_entropy_score,ranked_kurtosis_score,ranked_skew_score
+    #unique_saccade_number,source,position_shape_score,position_shape_amplitude_score,velocity_shape_amplitude_score,flatness_score,vector,dipvalue_score,entropy_score,kurtosis_score,skew_score,bfvalue_score,ranked_position_shape,ranked_position_shape_amplitude,ranked_velocity_shape_amplitude,ranked_flatness_score,ranked_dipvalue_score,ranked_entropy_score,ranked_kurtosis_score,ranked_skew_score
     
 
 """
@@ -109,7 +107,7 @@ if __name__ == '__main__':
                 lambda x: abs(x-self.__average_saccade["velocity_z_trans"].values)
                 )   
         
-        self.__scores["velocity_shape"] = self.__saccades.groupby("unique_saccade_number")["residual_velocity_z_trans"].apply(
+        self.__scores["velocity_shape_score"] = self.__saccades.groupby("unique_saccade_number")["residual_velocity_z_trans"].apply(
                 lambda x:np.mean(x)
                 )
 """

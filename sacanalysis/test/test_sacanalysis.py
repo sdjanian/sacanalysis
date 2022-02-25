@@ -2,6 +2,9 @@ from sacanalysis import Preproccesing, SaccadeAnalysis
 import pandas as pd
 
 if __name__ == "__main__":
+    """
+    Run this script after installation to test 
+    """
     test_df = pd.read_csv("test_data.csv")
     test_df = test_df.rename(columns = {"speed_1":"velocity"})
     #test_df = test_df.drop(columns = ["source"])
