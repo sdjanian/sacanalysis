@@ -22,7 +22,7 @@ class Load_gazecom:
                     'Smooth Pursuit':3,
                     'Noise':4}
        
-    def __init__(self, GAZECOM_PATH = 'GazeCom_Data\\all_features'):
+    def __init__(self, GAZECOM_PATH = os.path.join(os.getcwd(),'GazeCom_all_features')):
         """
         :param GAZECOM_PATH: Path where the GazeCom dataset is located. By default set to '\GazeCom_Data\all_features'
         """
