@@ -7,7 +7,13 @@ There are many automatic methods for the detection of eye movement types like fi
 ## Dataset
 Our analysis is based on the GazeCom dataset. The scripts in this repository use the GazeCom dataset but another dataset can be used as long as the dataframe used is in the correct format. The GazeCom dataset can be found [here](http://michaeldorr.de/smoothpursuit/deep_eye_movement_classification_package.zip). The correct folder can be found at deep_eye_movement_classification_package --> data --> inputs --> GazeCom_all_features.zip. If default pathing is wanted, place the GazeCom_all_features folder in the same folder as ```main.py```.
 
-This is an example of how the data should be formated with corresponding column names. It contains the time of the recording in milliseconds, and the and x and y coordinates of the eye movements.  The column labelled “handlabeller_final” is the eye movement class, with fixation as code X, saccades as code Y and smooth pursuit as code Z, etc….  “Velocity” is self-explanatory. In the GazeCom dataset they have multiple velocities named speed_1, speed_2 ... speed_16. We use speed_1 and rename it to velocity. “Source” is the file name and “subject” is the subject identifier.
+This is an example of how the data should be formated with corresponding column names. It contains the time of the recording in milliseconds, and the and x and y coordinates of the eye movements.  The column labelled “handlabeller_final” is the eye movement class, unknown as code 0, with fixation as code 1, saccades as code 2, smooth pursuit as code 3, and noise as code 4. “Velocity” is self-explanatory. In the GazeCom dataset they have multiple velocities named speed_1, speed_2 ... speed_16. We use speed_1 and rename it to velocity. “Source” is the file name and “subject” is the subject identifier.
+
+% - 0 is UNKNOWN
+% - 1 is FIX (fixation)
+% - 2 is SACCADE
+% - 3 is SP (smooth pursuit)
+% - 4 is NOISE
 
 | time  | x | y | handlabeller_final | velocity | source | subject |
 | ------------- | ------------- | ------------- | ------------- | ------------- | ------------- |------------- |
