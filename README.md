@@ -65,9 +65,8 @@ python setup.py install
 In conda promt copy paste this snippet and change ```python PATH``` to the master directory:
 ```python
 cd PATH
-conda create --name saccade_analysis_test python=3.6 -y
-conda activate saccade_analysis_test
-conda install -c r rpy2 -y
+conda create --name saccade_analysis python=3.6 -y
+conda activate saccade_analysis
 pip install .
 ```
 ### Test if installed correctly
