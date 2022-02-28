@@ -9,12 +9,6 @@ Our analysis is based on the GazeCom dataset. The scripts in this repository use
 
 This is an example of how the data should be formated with corresponding column names. It contains the time of the recording in milliseconds, and the and x and y coordinates of the eye movements.  The column labelled “handlabeller_final” is the eye movement class, unknown as code 0, with fixation as code 1, saccades as code 2, smooth pursuit as code 3, and noise as code 4. “Velocity” is self-explanatory. In the GazeCom dataset they have multiple velocities named speed_1, speed_2 ... speed_16. We use speed_1 and rename it to velocity. “Source” is the file name and “subject” is the subject identifier.
 
-% - 0 is UNKNOWN
-% - 1 is FIX (fixation)
-% - 2 is SACCADE
-% - 3 is SP (smooth pursuit)
-% - 4 is NOISE
-
 | time  | x | y | handlabeller_final | velocity | source | subject |
 | ------------- | ------------- | ------------- | ------------- | ------------- | ------------- |------------- |
 | 1  | 22.57  | 0.19  | 4  | 0  | GazeCom_Data\all_features\beach\AAF_beach.arff  |AAF  |
