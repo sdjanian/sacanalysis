@@ -56,19 +56,7 @@ Is used to perform [Hartigan's Diptest for Unimodality](https://github.com/alimu
     pip install .
     ```
 
-Alternatively it can also be installed with using `setup.py` install instead.
-```python
-cd PATH
-python setup.py install
-```
-### Quick Windows install
-In conda promt copy paste this snippet and change ```python PATH``` to the master directory:
-```python
-cd PATH
-conda create --name saccade_analysis python=3.6 -y
-conda activate saccade_analysis
-pip install .
-```
+Note: If you wish to use Spyder as your preferred IDE , it might need to be installed in the new conda environment. This can be done with the command ```conda install spyder ``` in the conda prompt while the ```saccade_analysis``` environment is active.
 ### Test if installed correctly
 Run `test/test_sacanalysis.py`. If there are no errors it is installed correctly.
 ### Common bugs
@@ -93,7 +81,7 @@ and then run `main.py`
 
 
 ## Citation
-How to cite ...
+Will be updated once the paper is published.
 
 ## Author
 Shagen Djanian \
